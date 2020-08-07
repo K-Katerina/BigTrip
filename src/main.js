@@ -1,5 +1,3 @@
-const TRIP_ITEMS = 3;
-
 import {createTripInfo} from "./view/trip-info.js";
 import {createTripInfoCost} from "./view/trip-info-cost";
 import {createMenu} from "./view/menu";
@@ -9,7 +7,12 @@ import {createTripEditItem} from "./view/trip-edit-item";
 import {createTripDayList} from "./view/trip-day-list";
 import {createTripDay} from "./view/trip-day";
 import {createTripItem} from "./view/trip-item";
-import {render} from "./view/utils";
+import {render} from "./utils";
+import {generateTripItemArray} from "./mock/trip-item";
+
+const TRIP_ITEMS = 15;
+
+const tripItemArray = generateTripItemArray(TRIP_ITEMS);
 
 const body = document.querySelector(`.page-body`);
 
@@ -25,7 +28,7 @@ render(tripControls, createFilter(), `beforeend`);
 
 const tripEvents = body.querySelector(`.trip-events`);
 render(tripEvents, createSort(), `beforeend`);
-render(tripEvents, createTripEditItem(), `beforeend`);
+render(tripEvents, createTripEditItem(tripItemArray[0]), `beforeend`);
 
 render(tripEvents, createTripDayList(), `beforeend`);
 
@@ -33,6 +36,4 @@ const tripDayList = body.querySelector(`.trip-days`);
 render(tripDayList, createTripDay(), `beforeend`);
 
 const tripItemList = tripDayList.children[0].querySelector(`.trip-events__list`);
-for (let i = 0; i < TRIP_ITEMS; i++) {
-  render(tripItemList, createTripItem(), `beforeend`);
-}
+tripItemArray.forEach((tripItem) => render(tripItemList, createTripItem(tripItem), `beforeend`));
