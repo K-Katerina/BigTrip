@@ -37,8 +37,13 @@ export const parseDate = (ms) => {
 export const getInOrTo = (type) => TYPE_TRIP_ITEM_IN.indexOf(type) > 0 ? `in` : `to`;
 
 export const getDuration = (begin, end) => {
-  const duration = new Date(end - begin);
-  return (duration.getDay() > 0 ? duration.getDay() + `d ` : ``)
-    + (duration.getHours() > 0 ? duration.getHours() + `h ` : ``)
-    + duration.getMinutes() + `m`;
+  let delta = Math.floor((end - begin) / 1000);
+  const days = Math.floor(delta / 86400);
+  delta -= days * 86400;
+  const hours = Math.floor(delta / 3600) % 24;
+  delta -= hours * 3600;
+  const minutes = Math.floor(delta / 60) % 60;
+  return (days > 0 ? days + `d ` : ``)
+    + (hours > 0 ? hours + `h ` : ``)
+    + minutes + `m`;
 };

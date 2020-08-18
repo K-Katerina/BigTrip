@@ -16,8 +16,8 @@ const getCity = () => utils.getRandomItemFromArray(consts.CITY_TRIP);
 const getCost = () => utils.getRandomNumberOfRange(MIN_COST, MAX_COST);
 const getFavorite = () => Boolean(utils.getRandomNumberOfRange(0, 1));
 const getOffers = () => consts.OFFERS;
-const getDesc = () => utils.getRandomArray(consts.DESC);
-const getPhoto = () => Array(utils.getRandomNumberOfRange(0, MAX_PHOTOS)).map(() => `http://picsum.photos/248/152?r=` + Math.random());
+const getDesc = () => utils.getRandomArray(consts.DESC).join(` `);
+const getPhoto = () => Array(utils.getRandomNumberOfRange(0, MAX_PHOTOS)).fill(``).map(() => `http://picsum.photos/248/152?r=` + Math.random());
 
 const generateTripItem = () => {
   const begin = getRandomDate();

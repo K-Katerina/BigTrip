@@ -3,20 +3,17 @@ import {parseTime, getDuration, getInOrTo} from "../utils";
 let MAX_OFFERS = 3;
 
 const getOffers = (offers) => {
-  let offersList = ``;
-  for (let i = 0; i < Math.min(MAX_OFFERS, offers.length); i++) {
-    offersList +=
-    `<li class="event__offer">
-      <span class="event__offer-title">${offers[i].name}</span>
-      &plus;&nbsp;&euro;&nbsp;
-      <span class="event__offer-price">${offers[i].price}</span>
-    </li>`;
-  }
+  const checkedOffers = offers.filter((offer) => offer.checked);
   return (
-    offers.length > 0 ?
+    checkedOffers.length > 0 ?
       `<ul class="event__selected-offers">
-        ${offersList}
-      </ul>` : ``);
+      ${checkedOffers.slice(0, Math.min(MAX_OFFERS, checkedOffers.length)).map((offer) =>
+      `<li class="event__offer">
+        <span class="event__offer-title">${offer.name}</span>
+          &plus;&nbsp;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </li>`).join(``)}
+    </ul>` : ``);
 };
 
 export const createTripItem = (tripItem) => {

@@ -1,49 +1,38 @@
 import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, OFFERS} from "../const";
 import {parseTime, parseDate, getInOrTo} from "../utils";
 
-const fillTypeGroup = (array) => {
-  let typeList = ``;
-  for (let typeTrip of array) {
-    typeList +=
-      `<div class="event__type-item">
-        <input id="event-type-${typeTrip.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTrip.toLowerCase()}">
-        <label class="event__type-label  event__type-label--${typeTrip.toLowerCase()}" for="event-type-${typeTrip.toLowerCase()}-1">${typeTrip}</label>
-      </div>`;
-  }
-  return typeList;
+const fillTypeGroup = (types) => {
+  return types.map((typeTrip) =>
+    `<div class="event__type-item">
+      <input id="event-type-${typeTrip.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTrip.toLowerCase()}">
+      <label class="event__type-label  event__type-label--${typeTrip.toLowerCase()}" for="event-type-${typeTrip.toLowerCase()}-1">${typeTrip}</label>
+    </div>`
+  ).join(``);
 };
-
-const getCityList = () => {
-  let cityList = ``;
-  for (let city of CITY_TRIP) {
-    cityList += `<option value="${city}"></option>\n`;
-  }
-  return cityList;
-};
-
-const getChecked = (checked) => checked ? `checked` : ``;
 
 const getOffers = (offers) => {
   if (!offers) {
     offers = OFFERS.slice();
   }
-  let offerList = ``;
-  for (let offer of offers) {
-    offerList +=
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${getChecked(offer.checked)}>
-        <label class="event__offer-label" for="event-offer-${offer.type}-1">
-          <span class="event__offer-title">${offer.name}</span>
-          &plus;&nbsp;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-        </label>
-      </div>`;
-  }
-  return offerList;
+  return offers.map((offer) =>
+    `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
+      <label class="event__offer-label" for="event-offer-${offer.type}-1">
+        <span class="event__offer-title">${offer.name}</span>
+        &plus;&nbsp;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+      </label>
+    </div>`
+  ).join(``);
+};
+
+const getPhoto = (photos) => {
+  return photos.map((photo) =>
+    `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``);
 };
 
 export const createTripEditItem = (tripItem) => {
   return (`
-      <form class="event event--edit" action="#" method="post">
+      <form class="trip-events__item event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -71,7 +60,7 @@ export const createTripEditItem = (tripItem) => {
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${tripItem.city}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${getCityList()}
+              ${CITY_TRIP.map((city) => `<option value="${city}"></option>\n`).join(``)}
             </datalist>
           </div>
 
@@ -98,7 +87,7 @@ export const createTripEditItem = (tripItem) => {
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
 
-          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${getChecked(tripItem.favorite)}>
+          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.favorite ? `checked` : ``}>
           <label class="event__favorite-btn" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -112,11 +101,20 @@ export const createTripEditItem = (tripItem) => {
         </header>
 
         <section class="event__details">
-          <section class="event__section  event__section--offers">
+          <section class="event__section event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
               ${getOffers(tripItem.offers)}
+            </div>
+          </section>
+          <section class="event__section event__section--destination ${tripItem.destination.desc.length + tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
+            <h3 class="event__section-title event__section-title--destination">Destination</h3>
+            <p class="event__destination-description">${tripItem.destination.desc}</p>
+            <div class="event__photos-container ${tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
+              <div class="event__photos-tape">
+                ${getPhoto(tripItem.destination.photo)}
+              </div>
             </div>
           </section>
         </section>
