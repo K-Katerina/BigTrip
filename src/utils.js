@@ -1,7 +1,27 @@
-import {TYPE_TRIP_ITEM_IN} from "./const";
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
 
-export const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
+// export const renderTemplate = (container, template, place) => {
+//   container.insertAdjacentHTML(place, template);
+// };
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstElementChild;
 };
 
 export const getRandomNumberOfRange = (a, b) => {
@@ -33,8 +53,6 @@ export const parseDate = (ms) => {
   const date = new Date(ms);
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 };
-
-export const getInOrTo = (type) => TYPE_TRIP_ITEM_IN.indexOf(type) > 0 ? `in` : `to`;
 
 export const getDuration = (begin, end) => {
   let delta = Math.floor((end - begin) / 1000);

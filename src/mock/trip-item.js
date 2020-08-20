@@ -1,5 +1,5 @@
-import * as consts from "../const";
 import * as utils from "../utils";
+import * as consts from "../const";
 
 const MIN_COST = 10;
 const MAX_COST = 1000;
