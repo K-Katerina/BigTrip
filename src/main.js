@@ -61,30 +61,25 @@ const createTripItem = (tripEventsListElement, tripItem) => {
   const tripEditItemView = new TripEditItem(tripItem);
   render(tripEventsListElement, tripItemView.getElement(), RenderPosition.BEFOREEND);
 
-  const buttonOnTripItemView = tripItemView.getElement().querySelector(`.event__rollup-btn`);
-  const buttonOnTripEditItemView = tripEditItemView.getElement().querySelector(`.event__rollup-btn`);
-  const submitButtonOnTripEditItemView = tripEditItemView.getElement().querySelector(`.event__save-btn`);
-  const resetButtonOnTripEditItemView = tripEditItemView.getElement().querySelector(`.event__reset-btn`);
-
-  buttonOnTripItemView.addEventListener(`click`, () => {
+  tripItemView.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
     replaceTripItemToTripEditItem();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  buttonOnTripEditItemView.addEventListener(`click`, () => {
+  tripEditItemView.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
     // сброс данных формы, tripItem не трогать
     replaceTripEditItemToTripItem();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  submitButtonOnTripEditItemView.addEventListener(`submit`, (evt) => {
+  tripEditItemView.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     // сохранение данных формы, обновление tripItem
     replaceTripEditItemToTripItem();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  resetButtonOnTripEditItemView.addEventListener(`click`, () => {
+  tripEditItemView.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, () => {
     // сброс данных формы, tripItem не трогать
     replaceTripEditItemToTripItem();
     document.removeEventListener(`keydown`, onEscKeyDown);
