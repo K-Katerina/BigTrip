@@ -1,5 +1,5 @@
 import {MONTH_NAMES} from "../const";
-import {createElement} from "../utils";
+import AbstractView from "./abstract-view";
 
 const createTripDayTemplate = (day, index) => {
   const date = new Date(day);
@@ -13,25 +13,14 @@ const createTripDayTemplate = (day, index) => {
   `);
 };
 
-export default class TripDay {
+export default class TripDay extends AbstractView {
   constructor(tripDay, index) {
+    super();
     this._tripDay = tripDay;
     this._index = index;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripDayTemplate(this._tripDay, this._index);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
