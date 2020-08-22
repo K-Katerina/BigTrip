@@ -1,5 +1,5 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, OFFERS} from "../const";
-import {parseTime, parseDate, getInOrTo} from "../utils";
+import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, OFFERS, getInOrTo} from "../const";
+import {parseTime, parseDate, createElement} from "../utils";
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
@@ -30,8 +30,9 @@ const getPhoto = (photos) => {
     `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``);
 };
 
-export const createTripEditItem = (tripItem) => {
+const createTripEditItemTemplate = (tripItem) => {
   return (`
+    <li class="trip-events__item">
       <form class="trip-events__item event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
@@ -111,7 +112,7 @@ export const createTripEditItem = (tripItem) => {
           <section class="event__section event__section--destination ${tripItem.destination.desc.length + tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
             <h3 class="event__section-title event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${tripItem.destination.desc}</p>
-            <div class="event__photos-container ${tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
+            <div class="event__photos-container ${tripItem.destination.photo.length ? `` : `visually-hidden`}">
               <div class="event__photos-tape">
                 ${getPhoto(tripItem.destination.photo)}
               </div>
@@ -119,5 +120,29 @@ export const createTripEditItem = (tripItem) => {
           </section>
         </section>
       </form>
-    `);
+    </li>
+  `);
 };
+
+export default class TripEditItem {
+  constructor(tripEditItem) {
+    this._tripEditItem = tripEditItem;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEditItemTemplate(this._tripEditItem);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+

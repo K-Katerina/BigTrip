@@ -1,6 +1,21 @@
-import {parseTime, getDuration, getInOrTo} from "../utils";
+import {parseTime, getDuration, createElement} from "../utils";
+import {CITY_TRIP, getInOrTo, OFFERS, TYPE_TRIP_ITEM_TO} from "../const";
 
 let MAX_OFFERS = 3;
+
+const BLANK_TRIP_ITEM = {
+  type: TYPE_TRIP_ITEM_TO[0],
+  city: CITY_TRIP[0],
+  timeBegin: Date.now(),
+  timeEnd: Date.now(),
+  cost: 0,
+  favorite: false,
+  offers: OFFERS,
+  destination: {
+    desc: ``,
+    photo: ``
+  }
+};
 
 const getOffers = (offers) => {
   const checkedOffers = offers.filter((offer) => offer.checked);
@@ -16,12 +31,12 @@ const getOffers = (offers) => {
     </ul>` : ``);
 };
 
-export const createTripItem = (tripItem) => {
+const createTripItemTemplate = (tripItem) => {
   return (`
     <li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${tripItem.type}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${tripItem.type.toLowerCase()}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${tripItem.type} ${getInOrTo(tripItem.type)} ${tripItem.city}</h3>
 
@@ -48,3 +63,25 @@ export const createTripItem = (tripItem) => {
     </li>
   `);
 };
+
+export default class TripItem {
+  constructor(tripItem = BLANK_TRIP_ITEM) {
+    this._tripItem = tripItem;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripItemTemplate(this._tripItem);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
