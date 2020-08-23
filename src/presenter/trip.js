@@ -1,4 +1,5 @@
 import {render, RenderPosition, replace} from "../utils/render";
+import {groupTripEventsByBeginningOfDay} from "../utils/common";
 import TripItem from "../view/trip-item";
 import TripEditItem from "../view/trip-edit-item";
 import TripDay from "../view/trip-day";
@@ -62,17 +63,18 @@ const createTripDay = (tripDayListView, tripGroupsByDay, day, index) => {
 };
 
 export default class Trip {
-  constructor(tripEventsView) {
-    this._tripEventsView = tripEventsView;
+  constructor(tripEventsContainer) {
+    this._tripEventsContainer = tripEventsContainer;
   }
-  init(tripGroupsByDay) {
-    if (!tripGroupsByDay.size) {
-      render(this._tripEventsView, new NoItems(), RenderPosition.BEFOREEND);
-    } else {
-      render(this._tripEventsView, new Sort(), RenderPosition.BEFOREEND);
+  init(tripItemArray) {
+    if (!tripItemArray.length) {
+      render(this._tripEventsContainer, new NoItems(), RenderPosition.BEFOREEND);
+      return;
     }
+    render(this._tripEventsContainer, new Sort(), RenderPosition.BEFOREEND);
+    const tripGroupsByDay = groupTripEventsByBeginningOfDay(tripItemArray);
     const tripDayListView = new TripDayList();
-    render(this._tripEventsView, tripDayListView, RenderPosition.BEFOREEND);
+    render(this._tripEventsContainer, tripDayListView, RenderPosition.BEFOREEND);
     Array.from(tripGroupsByDay.keys()).sort().forEach((day, index) => createTripDay(tripDayListView, tripGroupsByDay, day, index));
   }
 }
