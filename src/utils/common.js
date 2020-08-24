@@ -1,29 +1,3 @@
-export const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
-};
-
-// export const renderTemplate = (container, template, place) => {
-//   container.insertAdjacentHTML(place, template);
-// };
-
-export const render = (container, element, place) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(element);
-      break;
-  }
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-  return newElement.firstElementChild;
-};
-
 export const getRandomNumberOfRange = (a, b) => {
   return Math.round(a + Math.random() * (b - a));
 };
@@ -42,6 +16,25 @@ const shuffle = (array) => {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+};
+
+export const getBeginningOfDay = (ms) => {
+  const date = new Date(ms);
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date.getTime();
+};
+
+export const groupTripEventsByBeginningOfDay = (tripEvents) => {
+  const map = new Map();
+  tripEvents.forEach((trip) => {
+    const beginningOfDay = getBeginningOfDay(trip.timeBegin);
+    map.set(beginningOfDay, map.get(beginningOfDay) || []);
+    map.get(beginningOfDay).push(trip);
+  });
+  return map;
 };
 
 export const parseTime = (ms) => {

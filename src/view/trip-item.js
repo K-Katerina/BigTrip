@@ -1,5 +1,6 @@
-import {parseTime, getDuration, createElement} from "../utils";
+import {parseTime, getDuration} from "../utils/common";
 import {CITY_TRIP, getInOrTo, OFFERS, TYPE_TRIP_ITEM_TO} from "../const";
+import AbstractView from "./abstract-view";
 
 let MAX_OFFERS = 3;
 
@@ -64,24 +65,24 @@ const createTripItemTemplate = (tripItem) => {
   `);
 };
 
-export default class TripItem {
+export default class TripItem extends AbstractView {
   constructor(tripItem = BLANK_TRIP_ITEM) {
+    super();
     this._tripItem = tripItem;
-    this._element = null;
+    this._editFormClickHandler = this._editFormClickHandler.bind(this);
+  }
+
+  _editFormClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editFormClick();
   }
 
   getTemplate() {
     return createTripItemTemplate(this._tripItem);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  openEditFormClickHandler(callback) {
+    this._callback.editFormClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editFormClickHandler);
   }
 }

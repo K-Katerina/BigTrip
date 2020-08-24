@@ -1,13 +1,13 @@
-import {createElement} from "../utils";
 import {MONTH_NAMES} from "../const";
+import AbstractView from "./abstract-view";
 
-const createTripInfoTemplate = (tripItemArray, days) => {
-  const startDay = days[0] || 0;
-  const endDay = days[days.length - 1] || 0;
+const createTripInfoTemplate = (events) => {
+  const startDay = events.length ? events.slice().sort((a, b) => a.timeBegin - b.timeBegin)[0].timeBegin : 0;
+  const endDay = events.length ? events.slice().sort((a, b) => b.timeEnd - a.timeEnd)[0].timeEnd : 0;
   return (`
     <section class="trip-main__trip-info  trip-info">
-      <div class="trip-info__main ${tripItemArray.length ? `` : `visually-hidden`}">
-        <h1 class="trip-info__title">${[...new Set(tripItemArray.map((trip) => trip.city))].join(` &mdash; `)}</h1>
+      <div class="trip-info__main ${events.length ? `` : `visually-hidden`}">
+        <h1 class="trip-info__title">${[...new Set(events.map((trip) => trip.city))].join(` &mdash; `)}</h1>
         <p class="trip-info__dates">
           ${MONTH_NAMES[new Date(startDay).getMonth()]}&nbsp;${new Date(startDay).getDate()}&nbsp;&mdash;&nbsp;${new Date(endDay).getDate()}
         </p>
@@ -16,25 +16,13 @@ const createTripInfoTemplate = (tripItemArray, days) => {
   `);
 };
 
-export default class TripInfo {
-  constructor(tripInfo, days) {
-    this._tripInfo = tripInfo;
-    this._days = days;
-    this._element = null;
+export default class TripInfo extends AbstractView {
+  constructor(events) {
+    super();
+    this._events = events;
   }
 
   getTemplate() {
-    return createTripInfoTemplate(this._tripInfo, this._days);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return createTripInfoTemplate(this._events);
   }
 }

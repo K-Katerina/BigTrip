@@ -1,5 +1,6 @@
 import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, OFFERS, getInOrTo} from "../const";
-import {parseTime, parseDate, createElement} from "../utils";
+import {parseTime, parseDate} from "../utils/common";
+import AbstractView from "./abstract-view";
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
@@ -124,25 +125,41 @@ const createTripEditItemTemplate = (tripItem) => {
   `);
 };
 
-export default class TripEditItem {
+export default class TripEditItem extends AbstractView {
   constructor(tripEditItem) {
+    super();
     this._tripEditItem = tripEditItem;
-    this._element = null;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._editClickHandler = this._editClickHandler.bind(this);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
   getTemplate() {
     return createTripEditItemTemplate(this._tripEditItem);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  closeEditFormClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
   }
 
-  removeElement() {
-    this._element = null;
+  deleteEditFormClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._editClickHandler);
+  }
+
+  formEditSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
   }
 }
 

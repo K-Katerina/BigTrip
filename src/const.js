@@ -1,4 +1,4 @@
-import {getRandomNumberOfRange} from "./utils";
+import {getRandomNumberOfRange} from "./utils/common";
 
 export const TYPE_TRIP_ITEM_TO = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`];
 export const TYPE_TRIP_ITEM_IN = [`Check-in`, `Sightseeing`, `Restaurant`];

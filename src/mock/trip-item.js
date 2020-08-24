@@ -1,4 +1,4 @@
-import * as utils from "../utils";
+import * as utils from "../utils/common";
 import * as consts from "../const";
 
 const MIN_COST = 10;
