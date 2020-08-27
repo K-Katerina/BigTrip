@@ -9,10 +9,10 @@ import NoItems from "../view/no-items";
 import Sort from "../view/sort";
 import {SORT} from "../const";
 
-const createTripItem = (tripEventsListElement, tripItem) => {
+const createTripItem = (tripEventsListView, tripItem) => {
   const tripItemView = new TripItem(tripItem);
   const tripEditItemView = new TripEditItem(tripItem);
-  render(tripEventsListElement, tripItemView, RenderPosition.BEFOREEND);
+  render(tripEventsListView, tripItemView, RenderPosition.BEFOREEND);
 
   tripItemView.openEditFormClickHandler(() => {
     // показ формы редактирования
@@ -55,12 +55,11 @@ const createTripItem = (tripEventsListElement, tripItem) => {
   };
 };
 
-const createTripDay = (tripDayListView, trips, day, index, isSortedByEvent) => {
+const createTripDay = (tripDayListView, trips, isSortedByEvent, day = 0, index = 0) => {
   const tripDayView = new TripDay(day, index, isSortedByEvent);
   render(tripDayListView, tripDayView, RenderPosition.BEFOREEND);
   const tripEventsListView = new TripEventsList();
   render(tripDayView, tripEventsListView, RenderPosition.BEFOREEND);
-
   trips.forEach((tripItem) => createTripItem(tripEventsListView.getElement(), tripItem));
 };
 
@@ -69,8 +68,6 @@ export default class Trip {
     this._container = container;
     // this._createNewEventButton;
     this._tripDayListView = new TripDayList();
-    this._currentSortType = SORT.EVENT;
-    this._sortComponent = new Sort();
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
@@ -79,46 +76,57 @@ export default class Trip {
       render(this._container, new NoItems(), RenderPosition.BEFOREEND);
       return;
     }
-    this._group = new Map();
     this._trips = trips;
-    this._renderSort();
-    this._tripGroupsByDay = groupTripEventsByBeginningOfDay(trips);
-    this._renderEventList(this._tripGroupsByDay, this._currentSortType);
+    this._currentSortType = SORT.EVENT;
+    this._sortEvents(this._currentSortType);
   }
 
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._clearTaskList();
     this._sortEvents(sortType);
   }
 
   _sortEvents(sortType) {
+    this._currentSortType = sortType;
+    this._renderSort();
+
+    let sortedEvents;
     switch (sortType) {
       case SORT.TIME:
-        this._renderEventList(this._group.set(0, this._trips.sort((a, b) => (b.timeEnd - b.timeBegin) - (a.timeEnd - a.timeBegin))), sortType);
+        sortedEvents = [...this._trips].sort((a, b) => (b.timeEnd - b.timeBegin) - (a.timeEnd - a.timeBegin));
         break;
       case SORT.PRICE:
-        this._renderEventList(this._group.set(0, this._trips.sort((a, b) => b.cost - a.cost)), sortType);
+        sortedEvents = [...this._trips].sort((a, b) => b.cost - a.cost);
         break;
       default:
-        this._renderEventList(this._tripGroupsByDay, sortType);
+        sortedEvents = groupTripEventsByBeginningOfDay(this._trips);
     }
-    this._currentSortType = sortType;
+    this._renderEventList(sortedEvents, sortType);
   }
 
   _renderEventList(trips, sortType) {
-    render(this._container, this._tripDayListView, RenderPosition.BEFOREEND);
-    Array.from(trips.keys()).sort().forEach((day, index) => createTripDay(this._tripDayListView, trips.get(day), day, index, SORT.EVENT === sortType));
-  }
-
-  _clearTaskList() {
     this._tripDayListView.getElement().innerHTML = ``;
+    render(this._container, this._tripDayListView, RenderPosition.BEFOREEND);
+    if (sortType === SORT.EVENT) {
+      Array.from(trips.keys())
+        .sort()
+        .forEach((day, index) => {
+          createTripDay(this._tripDayListView, trips.get(day), SORT.EVENT === sortType, day, index);
+        });
+    } else {
+      createTripDay(this._tripDayListView, trips, SORT.EVENT === sortType);
+    }
   }
 
   _renderSort() {
-    render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
+    if (this._sortComponent) {
+      this._container.removeChild(this._sortComponent.getElement());
+      this._sortComponent.removeElement();
+    }
+    this._sortComponent = new Sort(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
   }
 }
