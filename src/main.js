@@ -6,7 +6,7 @@ import Menu from "./view/menu";
 import Filter from "./view/filter";
 import Trip from "./presenter/trip";
 
-export const TRIP_ITEMS = 10;
+export const TRIP_ITEMS = 7;
 
 const trips = generateTripItemArray(TRIP_ITEMS);
 
