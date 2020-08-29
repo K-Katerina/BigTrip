@@ -8,16 +8,16 @@ import Trip from "./presenter/trip";
 
 export const TRIP_ITEMS = 10;
 
-const tripItemArray = generateTripItemArray(TRIP_ITEMS);
+const trips = generateTripItemArray(TRIP_ITEMS);
 
 const body = document.querySelector(`.page-body`);
 const tripMainView = body.querySelector(`.trip-main`);
-const tripInfoView = new TripInfo(tripItemArray);
+const tripInfoView = new TripInfo(trips);
 render(tripMainView, tripInfoView, RenderPosition.AFTERBEGIN);
-render(tripInfoView, new TripInfoCost(tripItemArray), RenderPosition.BEFOREEND);
+render(tripInfoView, new TripInfoCost(trips), RenderPosition.BEFOREEND);
 const tripControlsView = tripMainView.querySelector(`.trip-controls`);
 render(tripControlsView, new Menu(), RenderPosition.BEFOREEND);
 render(tripControlsView, new Filter(), RenderPosition.BEFOREEND);
 
 const trip = new Trip(body.querySelector(`.trip-events`));
-trip.init(tripItemArray);
+trip.init(trips);

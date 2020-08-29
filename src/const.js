@@ -38,7 +38,15 @@ export const OFFERS = [
 ];
 
 export const FILTER = [`everything`, `future`, `past`];
-export const SORT = [`day`, `event`, `time`, `price`, `offers`];
+
+export const SORT = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
+export const SORT_DEFAULT = SORT.EVENT;
+
 export const MONTH_NAMES = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `June`, `July`, `Aug`, `Sept`, `Oct`, `Nov`, `Dec`];
 
 export const getTypeTripItem = () => [...TYPE_TRIP_ITEM_TO, ...TYPE_TRIP_ITEM_IN];

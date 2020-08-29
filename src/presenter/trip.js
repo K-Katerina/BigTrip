@@ -7,11 +7,12 @@ import TripEventsList from "../view/trip-events-list";
 import TripDayList from "../view/trip-day-list";
 import NoItems from "../view/no-items";
 import Sort from "../view/sort";
+import {SORT, SORT_DEFAULT} from "../const";
 
-const createTripItem = (tripEventsListElement, tripItem) => {
+const createTripItem = (tripEventsListView, tripItem) => {
   const tripItemView = new TripItem(tripItem);
   const tripEditItemView = new TripEditItem(tripItem);
-  render(tripEventsListElement, tripItemView, RenderPosition.BEFOREEND);
+  render(tripEventsListView, tripItemView, RenderPosition.BEFOREEND);
 
   tripItemView.openEditFormClickHandler(() => {
     // показ формы редактирования
@@ -54,27 +55,80 @@ const createTripItem = (tripEventsListElement, tripItem) => {
   };
 };
 
-const createTripDay = (tripDayListView, tripGroupsByDay, day, index) => {
-  const tripDayView = new TripDay(day, index);
+const createTripDay = (tripDayListView, trips, isDefaultSorting, day = 0, index = 0) => {
+  const tripDayView = new TripDay(day, index, isDefaultSorting);
   render(tripDayListView, tripDayView, RenderPosition.BEFOREEND);
   const tripEventsListView = new TripEventsList();
   render(tripDayView, tripEventsListView, RenderPosition.BEFOREEND);
-  tripGroupsByDay.get(day).forEach((tripItem) => createTripItem(tripEventsListView.getElement(), tripItem));
+  trips.forEach((tripItem) => createTripItem(tripEventsListView.getElement(), tripItem));
 };
 
 export default class Trip {
-  constructor(tripEventsContainer) {
-    this._tripEventsContainer = tripEventsContainer;
+  constructor(container) {
+    this._container = container;
+    this._currentSortType = SORT_DEFAULT;
+    this._trips = [];
+    this._tripDayListComponent = new TripDayList();
+    this._noEventsComponent = new NoItems();
+    this._sortComponent = new Sort();
+    // this._createNewEventButton;
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
-  init(tripItemArray) {
-    if (!tripItemArray.length) {
-      render(this._tripEventsContainer, new NoItems(), RenderPosition.BEFOREEND);
+
+  init(trips) {
+    if (!trips.length) {
+      render(this._container, this._noEventsComponent , RenderPosition.BEFOREEND);
       return;
     }
-    render(this._tripEventsContainer, new Sort(), RenderPosition.BEFOREEND);
-    const tripGroupsByDay = groupTripEventsByBeginningOfDay(tripItemArray);
-    const tripDayListView = new TripDayList();
-    render(this._tripEventsContainer, tripDayListView, RenderPosition.BEFOREEND);
-    Array.from(tripGroupsByDay.keys()).sort().forEach((day, index) => createTripDay(tripDayListView, tripGroupsByDay, day, index));
+    this._trips = [...trips];
+    this._renderSort();
+    this._renderDayList();
+    this._sortEvents(this._currentSortType);
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortEvents(sortType);
+  }
+
+  _sortEvents(sortType) {
+    this._currentSortType = sortType;
+
+    let sortedEvents;
+    switch (sortType) {
+      case SORT.TIME:
+        sortedEvents = [...this._trips].sort((a, b) => (b.timeEnd - b.timeBegin) - (a.timeEnd - a.timeBegin));
+        break;
+      case SORT.PRICE:
+        sortedEvents = [...this._trips].sort((a, b) => b.cost - a.cost);
+        break;
+      default:
+        sortedEvents = groupTripEventsByBeginningOfDay(this._trips);
+    }
+    this._renderEventList(sortedEvents, sortType === SORT_DEFAULT);
+  }
+
+  _renderEventList(trips, isDefaultSorting) {
+    this._tripDayListComponent.getElement().innerHTML = ``;
+    if (isDefaultSorting) {
+      Array.from(trips.keys())
+        .sort()
+        .forEach((day, index) => {
+          createTripDay(this._tripDayListComponent, trips.get(day), isDefaultSorting, day, index);
+        });
+    } else {
+      createTripDay(this._tripDayListComponent, trips, isDefaultSorting);
+    }
+  }
+
+  _renderSort() {
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderDayList() {
+    render(this._container, this._tripDayListComponent, RenderPosition.BEFOREEND);
   }
 }
