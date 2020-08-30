@@ -58,3 +58,7 @@ export const getDuration = (begin, end) => {
     + (hours > 0 ? hours + `h ` : ``)
     + minutes + `m`;
 };
+
+export const capitalizeWord = (word) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};

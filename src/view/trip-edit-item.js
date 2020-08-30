@@ -1,25 +1,24 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, OFFERS, getInOrTo} from "../const";
-import {parseTime, parseDate} from "../utils/common";
-import AbstractView from "./abstract-view";
+import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo} from "../const";
+import {parseTime, parseDate, capitalizeWord} from "../utils/common";
+import {Smart} from "./smart";
+import {getDesc as getNewDesc, getPhoto as getNewPhoto, getOffers as getOffersByType} from "../mock/trip-item";
+
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
     `<div class="event__type-item">
-      <input id="event-type-${typeTrip.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTrip.toLowerCase()}">
-      <label class="event__type-label  event__type-label--${typeTrip.toLowerCase()}" for="event-type-${typeTrip.toLowerCase()}-1">${typeTrip}</label>
+      <input id="event-type-${typeTrip.toLowerCase()}-${typeTrip.id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeTrip.toLowerCase()}">
+      <label class="event__type-label  event__type-label--${typeTrip.toLowerCase()}" for="event-type-${typeTrip.toLowerCase()}-${typeTrip.id}">${capitalizeWord(typeTrip)}</label>
     </div>`
   ).join(``);
 };
 
-const getOffers = (offers) => {
-  if (!offers) {
-    offers = OFFERS.slice();
-  }
-  return offers.map((offer) =>
+const getOffers = (tripItem) => {
+  return tripItem.offers.map((offer, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer.type}-1">
-        <span class="event__offer-title">${offer.name}</span>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${offer.checked ? `checked` : ``}>
+      <label class="event__offer-label" for="event-offer-${tripItem.type}-${tripItem.id}-${index}">
+        <span class="event__offer-title">${offer.title}</span>
         &plus;&nbsp;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
       </label>
     </div>`
@@ -58,7 +57,7 @@ const createTripEditItemTemplate = (tripItem) => {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${tripItem.type} ${getInOrTo(tripItem.type)}
+              ${capitalizeWord(tripItem.type)} ${getInOrTo(tripItem.type)}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${tripItem.city}" list="destination-list-1">
             <datalist id="destination-list-1">
@@ -89,7 +88,7 @@ const createTripEditItemTemplate = (tripItem) => {
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
 
-          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.favorite ? `checked` : ``}>
+          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``}>
           <label class="event__favorite-btn" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -107,7 +106,7 @@ const createTripEditItemTemplate = (tripItem) => {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-              ${getOffers(tripItem.offers)}
+              ${getOffers(tripItem)}
             </div>
           </section>
           <section class="event__section event__section--destination ${tripItem.destination.desc.length + tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
@@ -125,41 +124,91 @@ const createTripEditItemTemplate = (tripItem) => {
   `);
 };
 
-export default class TripEditItem extends AbstractView {
+export default class TripEditItem extends Smart {
   constructor(tripEditItem) {
     super();
-    this._tripEditItem = tripEditItem;
+    this._data = Object.assign({}, tripEditItem);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._editClickHandler = this._editClickHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._typeClickHandler = this._typeClickHandler.bind(this);
+    this._cityClickHandler = this._cityClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+  }
+
+  restoreHandlers() {
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+    Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._data);
   }
 
-  _editClickHandler(evt) {
+  _closeClickHandler(evt) {
     evt.preventDefault();
     this._callback.editClick();
   }
 
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(this._data);
+  }
+
+  _typeClickHandler(evt) {
+    evt.preventDefault();
+    const type = evt.target.value;
+    this.updateData({type, offers: getOffersByType(type)});
+  }
+
+  _cityClickHandler(evt) {
+    evt.preventDefault();
+    const city = evt.target.value;
+    const desc = getNewDesc();
+    const photo = getNewPhoto();
+    this.updateData({city, destination: {desc, photo}});
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
   getTemplate() {
-    return createTripEditItemTemplate(this._tripEditItem);
+    return createTripEditItemTemplate(this._data);
   }
 
   closeEditFormClickHandler(callback) {
     this._callback.editClick = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
   deleteEditFormClickHandler(callback) {
-    this._callback.editClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._editClickHandler);
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
   }
 
   formEditSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setTypeClickHandler() {
+    Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
+  }
+
+  setCityClickHandler() {
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 }
 

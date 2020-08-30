@@ -11,25 +11,30 @@ const getRandomDate = () => {
   );
 };
 
+const getId = () => Math.floor(Date.now() + Math.random() * 10000);
 const getTypeTrip = () => utils.getRandomItemFromArray(consts.getTypeTripItem());
 const getCity = () => utils.getRandomItemFromArray(consts.CITY_TRIP);
 const getCost = () => utils.getRandomNumberOfRange(MIN_COST, MAX_COST);
 const getFavorite = () => Boolean(utils.getRandomNumberOfRange(0, 1));
-const getOffers = () => consts.OFFERS;
-const getDesc = () => utils.getRandomArray(consts.DESC).join(` `);
-const getPhoto = () => Array(utils.getRandomNumberOfRange(0, MAX_PHOTOS)).fill(``).map(() => `http://picsum.photos/248/152?r=` + Math.random());
+export const getOffers = (type) => consts.OFFERS
+  .filter((offer) => offer.type === type)
+  .flatMap((offer) => offer.offers);
+export const getDesc = () => utils.getRandomArray(consts.DESC).join(` `);
+export const getPhoto = () => Array(utils.getRandomNumberOfRange(0, MAX_PHOTOS)).fill(``).map(() => `http://picsum.photos/248/152?r=` + Math.random());
 
 const generateTripItem = () => {
   const begin = getRandomDate();
   const end = getRandomDate();
+  const type = getTypeTrip();
   return {
-    type: getTypeTrip(),
+    id: getId(),
+    type,
     city: getCity(),
     timeBegin: Math.min(begin, end),
     timeEnd: Math.max(begin, end),
     cost: getCost(),
-    favorite: getFavorite(),
-    offers: getOffers(),
+    isFavorite: getFavorite(),
+    offers: getOffers(type),
     destination: {
       desc: getDesc(),
       photo: getPhoto()
