@@ -90,6 +90,7 @@ export default class FormTrip {
   }
 
   _handleSubmitClick(tripItem) {
+    // TODO перерисовка отбражения, тк сортировка не актуальна
     this._changeData(
         Object.assign({}, this._tripItem, tripItem)
     );

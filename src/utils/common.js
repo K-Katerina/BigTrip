@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const getRandomNumberOfRange = (a, b) => {
   return Math.round(a + Math.random() * (b - a));
 };
@@ -38,25 +40,26 @@ export const groupTripEventsByBeginningOfDay = (tripEvents) => {
 };
 
 export const parseTime = (ms) => {
-  const date = new Date(ms);
-  return `${date.getHours()}:${date.getMinutes()}`;
+  return moment(ms).format(`HH:mm`);
 };
 
 export const parseDate = (ms) => {
-  const date = new Date(ms);
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  return moment(ms).format(`DD-MM-YYYY HH:mm`);
 };
 
 export const getDuration = (begin, end) => {
-  let delta = Math.floor((end - begin) / 1000);
-  const days = Math.floor(delta / 86400);
-  delta -= days * 86400;
-  const hours = Math.floor(delta / 3600) % 24;
-  delta -= hours * 3600;
-  const minutes = Math.floor(delta / 60) % 60;
-  return (days > 0 ? days + `d ` : ``)
-    + (hours > 0 ? hours + `h ` : ``)
-    + minutes + `m`;
+  const result = [];
+  const duration = moment.duration(moment(end).diff(moment(begin)));
+  if (duration.days() > 0) {
+    result.push(`${duration.days()}d`);
+  }
+  if (duration.hours() > 0) {
+    result.push(`${duration.hours()}h`);
+  }
+  if (duration.minutes() > 0) {
+    result.push(`${duration.minutes()}m`);
+  }
+  return result.join(` `);
 };
 
 export const capitalizeWord = (word) => {

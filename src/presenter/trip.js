@@ -38,6 +38,7 @@ export default class Trip {
   _handleTripChange(updatedTrip) {
     this._trips = updateItem(this._trips, updatedTrip);
     this._tripsEvent[updatedTrip.id].init(updatedTrip);
+    this.init(this._trips);
   }
 
   _handleTripDelete(deletedTrip) {
