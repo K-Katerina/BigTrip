@@ -176,6 +176,20 @@ export default class TripEditItem extends Smart {
     this.updateData({timeEnd: selectedDates[0]});
   }
 
+  _getFlatpickr(element, msDefaultDate, dateChangeHandler) {
+    return flatpickr(
+        element,
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/Y H:i`,
+          defaultDate: new Date(msDefaultDate) || new Date(),
+          onChange: dateChangeHandler
+        }
+    );
+  }
+
   _setDatepicker() {
     if (this._datepickerBegin) {
       this._datepickerBegin.destroy();
@@ -185,32 +199,8 @@ export default class TripEditItem extends Smart {
       this._datepickerEnd.destroy();
       this._datepickerEnd = null;
     }
-    if (this._data.timeBegin) {
-      this._datepickerBegin = flatpickr(
-          this.getElement().querySelector(`#event-start-time`),
-          {
-            enableTime: true,
-            // eslint-disable-next-line camelcase
-            time_24hr: true,
-            dateFormat: `d/m/Y H:i`,
-            defaultDate: new Date(this._data.timeBegin) || new Date(),
-            onChange: this._timeBeginChangeHandler
-          }
-      );
-    }
-    if (this._data.timeEnd) {
-      this._datepickerEnd = flatpickr(
-          this.getElement().querySelector(`#event-end-time`),
-          {
-            enableTime: true,
-            // eslint-disable-next-line camelcase
-            time_24hr: true,
-            dateFormat: `d/m/Y H:i`,
-            defaultDate: new Date(this._data.timeEnd) || new Date(),
-            onChange: this._timeEndChangeHandler
-          }
-      );
-    }
+    this._datepickerBegin = this._getFlatpickr(this.getElement().querySelector(`#event-start-time`), this._data.timeBegin, this._timeBeginChangeHandler);
+    this._datepickerEnd = this._getFlatpickr(this.getElement().querySelector(`#event-end-time`), this._data.timeEnd, this._timeEndChangeHandler);
   }
 
   _typeClickHandler(evt) {
