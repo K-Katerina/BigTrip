@@ -1,8 +1,9 @@
 import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo} from "../const";
+import {getDesc as getNewDesc, getPhoto as getNewPhoto, getOffers as getOffersByType} from "../mock/trip-item";
 import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import {Smart} from "./smart";
-import {getDesc as getNewDesc, getPhoto as getNewPhoto, getOffers as getOffersByType} from "../mock/trip-item";
-
+import flatpickr from "flatpickr";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
@@ -31,6 +32,7 @@ const getPhoto = (photos) => {
 };
 
 const createTripEditItemTemplate = (tripItem) => {
+  const isSubmitDisabled = tripItem.timeBegin >= tripItem.timeEnd;
   return (`
     <li class="trip-events__item">
       <form class="trip-events__item event event--edit" action="#" method="post">
@@ -69,12 +71,12 @@ const createTripEditItemTemplate = (tripItem) => {
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${parseDate(tripItem.timeBegin)} ${parseTime(tripItem.timeBegin)}">
+            <input class="event__input  event__input--time" id="event-start-time" type="text" required name="event-start-time" value="${parseDate(tripItem.timeBegin)} ${parseTime(tripItem.timeBegin)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${parseDate(tripItem.timeEnd)} ${parseTime(tripItem.timeEnd)}">
+            <input class="event__input  event__input--time" id="event-end-time" type="text" required name="event-end-time" value="${parseDate(tripItem.timeEnd)} ${parseTime(tripItem.timeEnd)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -85,7 +87,7 @@ const createTripEditItemTemplate = (tripItem) => {
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${tripItem.cost}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? `disabled` : ``}>Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
 
           <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``}>
@@ -128,15 +130,21 @@ export default class TripEditItem extends Smart {
   constructor(tripEditItem) {
     super();
     this._data = Object.assign({}, tripEditItem);
+    this._datepickerBegin = null;
+    this._datepickerEnd = null;
+    this._setDatepicker();
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._timeBeginChangeHandler = this._timeBeginChangeHandler.bind(this);
+    this._timeEndChangeHandler = this._timeEndChangeHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._cityClickHandler = this._cityClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   restoreHandlers() {
+    this._setDatepicker();
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
@@ -158,6 +166,51 @@ export default class TripEditItem extends Smart {
   _deleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(this._data);
+  }
+
+  _timeBeginChangeHandler(selectedDates) {
+    this.updateData({timeBegin: selectedDates[0]});
+  }
+
+  _timeEndChangeHandler(selectedDates) {
+    this.updateData({timeEnd: selectedDates[0]});
+  }
+
+  _setDatepicker() {
+    if (this._datepickerBegin) {
+      this._datepickerBegin.destroy();
+      this._datepickerBegin = null;
+    }
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+    if (this._data.timeBegin) {
+      this._datepickerBegin = flatpickr(
+          this.getElement().querySelector(`#event-start-time`),
+          {
+            enableTime: true,
+            // eslint-disable-next-line camelcase
+            time_24hr: true,
+            dateFormat: `d/m/Y H:i`,
+            defaultDate: new Date(this._data.timeBegin) || new Date(),
+            onChange: this._timeBeginChangeHandler
+          }
+      );
+    }
+    if (this._data.timeEnd) {
+      this._datepickerEnd = flatpickr(
+          this.getElement().querySelector(`#event-end-time`),
+          {
+            enableTime: true,
+            // eslint-disable-next-line camelcase
+            time_24hr: true,
+            dateFormat: `d/m/Y H:i`,
+            defaultDate: new Date(this._data.timeEnd) || new Date(),
+            onChange: this._timeEndChangeHandler
+          }
+      );
+    }
   }
 
   _typeClickHandler(evt) {
