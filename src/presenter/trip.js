@@ -1,83 +1,89 @@
-import {deleteItem, render, RenderPosition, updateItem} from "../utils/render";
-import {groupTripEventsByBeginningOfDay} from "../utils/common";
+import {remove, render, RenderPosition} from "../utils/render";
 import TripDay from "../view/trip-day";
 import TripEventsList from "../view/trip-events-list";
 import TripDayList from "../view/trip-day-list";
 import NoItems from "../view/no-items";
 import Sort from "../view/sort";
-import {SORT, SORT_DEFAULT} from "../const";
-import FormTrip from "./form-trip";
+import TripItem from "./trip-item";
+import {SORT_DEFAULT} from "../const";
+import {sortEvents} from "../utils/sort";
+import NewItemTrip from "./new-item-trip";
 
 export default class Trip {
-  constructor(container) {
+  constructor(container, tripsModel) {
     this._container = container;
     this._currentSortType = SORT_DEFAULT;
-    this._trips = [];
+    this._tripsModel = tripsModel;
     this._tripsEvent = {};
     this._tripDayListComponent = new TripDayList();
     this._noEventsComponent = new NoItems();
     this._sortComponent = new Sort();
-    // this._createNewEventButton;
+    this._handleAddTrip = this._handleAddTrip.bind(this);
     this._handleTripChange = this._handleTripChange.bind(this);
     this._handleTripDelete = this._handleTripDelete.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._newTripItem = new NewItemTrip(this._container, this._handleAddTrip);
   }
 
-  init(trips) {
-    if (!trips.length) {
+  init() {
+    if (!this._tripsModel.getTrips().length) {
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND);
       return;
     }
-    this._trips = [...trips];
     this._renderSort();
     this._renderDayList();
-    this._sortEvents(this._currentSortType);
+    this._renderEventList(sortEvents(this._tripsModel.getTrips(), this._currentSortType), this._currentSortType === SORT_DEFAULT);
+  }
+
+  createNewTrip() {
+    this._newTripItem.init();
+  }
+
+  _handleAddTrip(updatedTrip) {
+    this._tripsModel.addTripItem(0, updatedTrip);
+    this.init();
   }
 
   _handleTripChange(updatedTrip) {
-    this._trips = updateItem(this._trips, updatedTrip);
+    this._tripsModel.updateTripItem(0, updatedTrip);
     this._tripsEvent[updatedTrip.id].init(updatedTrip);
-    this.init(this._trips);
+    this.init();
   }
 
   _handleTripDelete(deletedTrip) {
-    this._trips = deleteItem(this._trips, deletedTrip);
-    this.init(this._trips);
+    this._tripsModel.deleteTripItem(0, deletedTrip);
+    this.init();
   }
 
   _handleModeChange() {
+    this._newTripItem.destroy();
     Object
       .values(this._tripsEvent)
       .forEach((presenter) => presenter.resetView());
+  }
+
+  _clearTrips() {
+    this._newTripItem.destroy();
+    Object
+      .values(this._tripsEvent)
+      .forEach((event) => event.destroy());
+    this._tripsEvent = {};
+    remove(this._sortComponent);
+    remove(this._noEventsComponent);
+    this._currentSortType = SORT_DEFAULT;
   }
 
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._sortEvents(sortType);
-  }
-
-  _sortEvents(sortType) {
     this._currentSortType = sortType;
-
-    let sortedEvents;
-    switch (sortType) {
-      case SORT.TIME:
-        sortedEvents = [...this._trips].sort((a, b) => (b.timeEnd - b.timeBegin) - (a.timeEnd - a.timeBegin));
-        break;
-      case SORT.PRICE:
-        sortedEvents = [...this._trips].sort((a, b) => b.cost - a.cost);
-        break;
-      default:
-        sortedEvents = groupTripEventsByBeginningOfDay(this._trips);
-    }
-    this._renderEventList(sortedEvents, sortType === SORT_DEFAULT);
+    this._renderEventList(sortEvents(this._tripsModel.getTrips(), this._currentSortType), this._currentSortType === SORT_DEFAULT);
   }
 
   _createTripItem(tripEventsListView, tripItem) {
-    const tripEvent = new FormTrip(tripEventsListView, this._handleTripChange, this._handleTripDelete, this._handleModeChange);
+    const tripEvent = new TripItem(tripEventsListView, this._handleTripChange, this._handleTripDelete, this._handleModeChange);
     tripEvent.init(tripItem);
     this._tripsEvent[tripItem.id] = tripEvent;
   }
@@ -105,7 +111,7 @@ export default class Trip {
 
   _renderSort() {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-    render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
+    render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderDayList() {

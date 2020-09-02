@@ -11,8 +11,8 @@ const getRandomDate = () => {
   );
 };
 
-const getId = () => Math.floor(Date.now() + Math.random() * 10000);
-const getTypeTrip = () => utils.getRandomItemFromArray(consts.getTypeTripItem());
+export const getId = () => Math.floor(Date.now() + Math.random() * 10000);
+const getTypeTrip = () => utils.getRandomItemFromArray(consts.typeTripItem);
 const getCity = () => utils.getRandomItemFromArray(consts.CITY_TRIP);
 const getCost = () => utils.getRandomNumberOfRange(MIN_COST, MAX_COST);
 const getFavorite = () => Boolean(utils.getRandomNumberOfRange(0, 1));

@@ -2,7 +2,8 @@ import AbstractView from "../view/abstract-view";
 
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
+  BEFOREEND: `beforeend`,
+  AFTERFIRSTCHILD: `afterfirstchild`
 };
 
 export const render = (container, child, place) => {
@@ -20,6 +21,9 @@ export const render = (container, child, place) => {
       break;
     case RenderPosition.BEFOREEND:
       container.append(child);
+      break;
+    case RenderPosition.AFTERFIRSTCHILD:
+      container.insertBefore(child, container.firstChild.nextSibling);
       break;
   }
 };

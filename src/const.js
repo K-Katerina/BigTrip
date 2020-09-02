@@ -35,10 +35,17 @@ export const SORT = {
   PRICE: `price`
 };
 
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
+};
+
 export const SORT_DEFAULT = SORT.EVENT;
 
 export const MONTH_NAMES = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `June`, `July`, `Aug`, `Sept`, `Oct`, `Nov`, `Dec`];
 
-export const getTypeTripItem = () => [...TYPE_TRIP_ITEM_TO, ...TYPE_TRIP_ITEM_IN];
+export const typeTripItem = [...TYPE_TRIP_ITEM_TO, ...TYPE_TRIP_ITEM_IN];
 
 export const getInOrTo = (type) => TYPE_TRIP_ITEM_IN.indexOf(type) > 0 ? `in` : `to`;

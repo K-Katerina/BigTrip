@@ -1,4 +1,4 @@
-import TripItem from "../view/trip-item";
+import TripItemView from "../view/trip-item";
 import TripEditItem from "../view/trip-edit-item";
 import {remove, render, RenderPosition, replace} from "../utils/render";
 
@@ -7,7 +7,7 @@ const Mode = {
   EDITING: `EDITING`
 };
 
-export default class FormTrip {
+export default class TripItem {
   constructor(container, changeData, deletedData, changeMode) {
     this._container = container;
     this._changeData = changeData;
@@ -30,7 +30,7 @@ export default class FormTrip {
     const prevTripItemView = this._tripItemView;
     const prevEditItemView = this._tripEditItemView;
 
-    this._tripItemView = new TripItem(tripItem);
+    this._tripItemView = new TripItemView(tripItem);
     this._tripEditItemView = new TripEditItem(tripItem);
 
     this._tripItemView.openEditFormClickHandler(this._handleOpenClick);
@@ -38,8 +38,6 @@ export default class FormTrip {
     this._tripEditItemView.deleteEditFormClickHandler(this._handleDeleteClick);
     this._tripEditItemView.formEditSubmitHandler(this._handleSubmitClick);
     this._tripEditItemView.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._tripEditItemView.setTypeClickHandler();
-    this._tripEditItemView.setCityClickHandler();
 
 
     if (prevTripItemView === null || prevEditItemView === null) {
@@ -90,7 +88,6 @@ export default class FormTrip {
   }
 
   _handleSubmitClick(tripItem) {
-    // TODO перерисовка отбражения, тк сортировка не актуальна
     this._changeData(
         Object.assign({}, this._tripItem, tripItem)
     );

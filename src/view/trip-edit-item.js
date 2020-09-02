@@ -1,8 +1,13 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo} from "../const";
-import {getDesc as getNewDesc, getPhoto as getNewPhoto, getOffers as getOffersByType} from "../mock/trip-item";
-import {parseTime, parseDate, capitalizeWord} from "../utils/common";
-import {Smart} from "./smart";
+import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo, typeTripItem} from "../const";
 import flatpickr from "flatpickr";
+import {Smart} from "./smart";
+import {
+  getDesc as getNewDesc,
+  getPhoto as getNewPhoto,
+  getOffers as getOffersByType,
+  getId,
+} from "../mock/trip-item";
+import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const fillTypeGroup = (types) => {
@@ -34,7 +39,7 @@ const getPhoto = (photos) => {
 const createTripEditItemTemplate = (tripItem) => {
   const isSubmitDisabled = tripItem.timeBegin >= tripItem.timeEnd;
   return (`
-    <li class="trip-events__item">
+    <div class="trip-events__item">
       <form class="trip-events__item event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
@@ -122,17 +127,33 @@ const createTripEditItemTemplate = (tripItem) => {
           </section>
         </section>
       </form>
-    </li>
+    </div>
   `);
 };
 
+const typeDefault = typeTripItem[0];
+
+const NEW_TRIP = {
+  id: getId(),
+  type: typeDefault,
+  city: CITY_TRIP[0],
+  timeBegin: new Date(),
+  timeEnd: new Date(new Date().setHours(new Date().getHours() + 1)),
+  cost: 100,
+  isFavorite: false,
+  offers: getOffersByType(typeDefault),
+  destination: {
+    desc: ``,
+    photo: []
+  }
+};
+
 export default class TripEditItem extends Smart {
-  constructor(tripEditItem) {
+  constructor(tripEditItem = NEW_TRIP) {
     super();
     this._data = Object.assign({}, tripEditItem);
     this._datepickerBegin = null;
     this._datepickerEnd = null;
-    this._setDatepicker();
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
@@ -141,6 +162,7 @@ export default class TripEditItem extends Smart {
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._cityClickHandler = this._cityClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this.restoreHandlers();
   }
 
   restoreHandlers() {
@@ -153,9 +175,14 @@ export default class TripEditItem extends Smart {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 
+  static parseDataToTrip(data) {
+    data = Object.assign({}, data);
+    return data;
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._data);
+    this._callback.formSubmit(TripEditItem.parseDataToTrip(this._data));
   }
 
   _closeClickHandler(evt) {
@@ -228,30 +255,18 @@ export default class TripEditItem extends Smart {
 
   closeEditFormClickHandler(callback) {
     this._callback.editClick = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
   deleteEditFormClickHandler(callback) {
     this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
   }
 
   formEditSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
-  }
-
-  setTypeClickHandler() {
-    Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
-  }
-
-  setCityClickHandler() {
-    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
   }
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 }
 
