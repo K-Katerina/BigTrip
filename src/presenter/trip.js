@@ -1,4 +1,4 @@
-import {remove, render, RenderPosition} from "../utils/render";
+import {render, RenderPosition} from "../utils/render";
 import TripDay from "../view/trip-day";
 import TripEventsList from "../view/trip-events-list";
 import TripDayList from "../view/trip-day-list";
