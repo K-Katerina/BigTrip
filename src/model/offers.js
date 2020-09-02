@@ -1,5 +1,8 @@
-export default class Offers {
+import Observer from "../utils/observer";
+
+export default class Offers extends Observer{
   constructor() {
+    super();
     this._offers = [];
   }
 
@@ -17,7 +20,7 @@ export default class Offers {
     if (index === -1) {
       throw new Error(`Not found: "${offerType}"!`);
     }
-    // this._notify(offerType);
+    this._notify(offerType);
     return this._offers[index];
   }
 }

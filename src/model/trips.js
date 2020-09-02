@@ -1,11 +1,14 @@
-export default class Trips {
+import Observer from "../utils/observer";
+
+export default class Trips extends Observer {
   constructor() {
+    super();
     this._trips = [];
   }
 
   setTrips(updateType, trips) {
     this._trips = trips.slice();
-    // this._notify(updateType);
+    this._notify(updateType);
   }
 
   getTrips() {
@@ -25,7 +28,7 @@ export default class Trips {
       ...this._trips.slice(index + 1)
     ];
 
-    // this._notify(updateType, update);
+    this._notify(updateType, update);
   }
 
 
@@ -35,7 +38,7 @@ export default class Trips {
       ...this._trips
     ];
 
-    // this._notify(updateType, update);
+    this._notify(updateType, update);
   }
 
   deleteTripItem(updateType, update) {
@@ -50,6 +53,6 @@ export default class Trips {
       ...this._trips.slice(index + 1)
     ];
 
-    // this._notify(updateType);
+    this._notify(updateType);
   }
 }
