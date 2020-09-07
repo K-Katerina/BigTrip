@@ -7,7 +7,7 @@ const MAX_PHOTOS = 7;
 
 const getRandomDate = () => {
   return (
-    Date.now() + utils.getRandomNumberOfRange(1, 7 * 24 * 60 * 60 * 1000)
+    Date.now() + (10 * Math.random() - 5) * 24 * 60 * 60 * 1000
   );
 };
 

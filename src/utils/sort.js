@@ -1,7 +1,7 @@
 import {SORT} from "../const";
 import {groupTripEventsByBeginningOfDay} from "./common";
 
-export const sortEvents = (trips, sortType) => {
+export const getSortedTrips = (trips, sortType) => {
   switch (sortType) {
     case SORT.TIME:
       return [...trips].sort((a, b) => (b.timeEnd - b.timeBegin) - (a.timeEnd - a.timeBegin));

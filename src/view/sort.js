@@ -1,4 +1,4 @@
-import {SORT} from "../const";
+import {SORT, SORT_DEFAULT} from "../const";
 import {Smart} from "./smart";
 
 const createSortTemplate = (currentSortType = SORT.EVENT) => {
@@ -29,6 +29,7 @@ const createSortTemplate = (currentSortType = SORT.EVENT) => {
 export default class Sort extends Smart {
   constructor() {
     super();
+    this._currentSortType = SORT_DEFAULT;
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
     this.restoreHandlers();
   }

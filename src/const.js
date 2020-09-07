@@ -46,6 +46,12 @@ export const UpdateType = {
   INIT: `INIT`
 };
 
+export const UserAction = {
+  ADD: `ADD`,
+  UPDATE: `UPDATE`,
+  DELETE: `DELETE`
+};
+
 export const SORT_DEFAULT = SORT.EVENT;
 
 export const FILTER_DEFAULT = FILTER.EVERYTHING;
