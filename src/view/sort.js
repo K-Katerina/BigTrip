@@ -1,5 +1,5 @@
-import {SORT} from "../const";
-import AbstractView from "./abstract-view";
+import {SORT, SORT_DEFAULT} from "../const";
+import {Smart} from "./smart";
 
 const createSortTemplate = (currentSortType = SORT.EVENT) => {
   return (`
@@ -26,10 +26,16 @@ const createSortTemplate = (currentSortType = SORT.EVENT) => {
   `);
 };
 
-export default class Sort extends AbstractView {
+export default class Sort extends Smart {
   constructor() {
     super();
+    this._currentSortType = SORT_DEFAULT;
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+    this.restoreHandlers();
+  }
+
+  restoreHandlers() {
+    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
   }
 
   getTemplate() {
@@ -43,10 +49,10 @@ export default class Sort extends AbstractView {
     evt.preventDefault();
     this._currentSortType = evt.target.dataset.sortType;
     this._callback.sortTypeChange(this._currentSortType);
+    this.updateElement();
   }
 
   setSortTypeChangeHandler(callback) {
     this._callback.sortTypeChange = callback;
-    this.getElement().addEventListener(`click`, this._sortTypeChangeHandler);
   }
 }

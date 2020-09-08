@@ -1,17 +1,17 @@
-import TripItem from "../view/trip-item";
+import TripItemView from "../view/trip-item";
 import TripEditItem from "../view/trip-edit-item";
 import {remove, render, RenderPosition, replace} from "../utils/render";
+import {UpdateType, UserAction} from "../const";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
   EDITING: `EDITING`
 };
 
-export default class FormTrip {
-  constructor(container, changeData, deletedData, changeMode) {
+export default class TripItem {
+  constructor(container, changeData, changeMode) {
     this._container = container;
     this._changeData = changeData;
-    this._deletedData = deletedData;
     this._changeMode = changeMode;
     this._tripItem = null;
     this._tripItemView = null;
@@ -30,7 +30,7 @@ export default class FormTrip {
     const prevTripItemView = this._tripItemView;
     const prevEditItemView = this._tripEditItemView;
 
-    this._tripItemView = new TripItem(tripItem);
+    this._tripItemView = new TripItemView(tripItem);
     this._tripEditItemView = new TripEditItem(tripItem);
 
     this._tripItemView.openEditFormClickHandler(this._handleOpenClick);
@@ -38,8 +38,6 @@ export default class FormTrip {
     this._tripEditItemView.deleteEditFormClickHandler(this._handleDeleteClick);
     this._tripEditItemView.formEditSubmitHandler(this._handleSubmitClick);
     this._tripEditItemView.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._tripEditItemView.setTypeClickHandler();
-    this._tripEditItemView.setCityClickHandler();
 
 
     if (prevTripItemView === null || prevEditItemView === null) {
@@ -71,27 +69,28 @@ export default class FormTrip {
   }
 
   _handleOpenClick() {
-    // открытие формы редактирования
     this._replaceTripItemToTripEditItem();
     this._tripEditItemView.updateData(this._tripItem);
   }
 
   _handleCloseClick() {
-    // tripItem не трогать - несохранённые изменения пропадают.
     this._replaceTripEditItemToTripItem();
   }
 
   _handleDeleteClick(tripItem) {
-    // удаление tripItem
-    this._deletedData(
+    this._changeData(
+        UserAction.DELETE,
+        UpdateType.MINOR,
         Object.assign({}, tripItem)
     );
     this._replaceTripEditItemToTripItem();
   }
 
   _handleSubmitClick(tripItem) {
-    // TODO перерисовка отбражения, тк сортировка не актуальна
+    const isOldTime = this._tripItem.timeBegin === tripItem.timeBegin && this._tripItem.timeEnd === tripItem.timeEnd;
     this._changeData(
+        UserAction.UPDATE,
+        isOldTime ? UpdateType.PATCH : UpdateType.MINOR,
         Object.assign({}, this._tripItem, tripItem)
     );
     this._tripItemView.updateData(this._tripItem);

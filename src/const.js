@@ -27,7 +27,11 @@ export const OFFERS = [
   };
 });
 
-export const FILTER = [`everything`, `future`, `past`];
+export const FILTER = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
 
 export const SORT = {
   EVENT: `event`,
@@ -35,10 +39,25 @@ export const SORT = {
   PRICE: `price`
 };
 
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
+};
+
+export const UserAction = {
+  ADD: `ADD`,
+  UPDATE: `UPDATE`,
+  DELETE: `DELETE`
+};
+
 export const SORT_DEFAULT = SORT.EVENT;
+
+export const FILTER_DEFAULT = FILTER.EVERYTHING;
 
 export const MONTH_NAMES = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `June`, `July`, `Aug`, `Sept`, `Oct`, `Nov`, `Dec`];
 
-export const getTypeTripItem = () => [...TYPE_TRIP_ITEM_TO, ...TYPE_TRIP_ITEM_IN];
+export const typeTripItem = [...TYPE_TRIP_ITEM_TO, ...TYPE_TRIP_ITEM_IN];
 
 export const getInOrTo = (type) => TYPE_TRIP_ITEM_IN.indexOf(type) > 0 ? `in` : `to`;

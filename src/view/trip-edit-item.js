@@ -1,8 +1,12 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo} from "../const";
-import {getDesc as getNewDesc, getPhoto as getNewPhoto, getOffers as getOffersByType} from "../mock/trip-item";
-import {parseTime, parseDate, capitalizeWord} from "../utils/common";
-import {Smart} from "./smart";
+import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo, typeTripItem} from "../const";
 import flatpickr from "flatpickr";
+import {Smart} from "./smart";
+import {
+  getDesc as getNewDesc,
+  getPhoto as getNewPhoto,
+  getOffers as getOffersByType,
+} from "../mock/trip-item";
+import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const fillTypeGroup = (types) => {
@@ -33,8 +37,9 @@ const getPhoto = (photos) => {
 
 const createTripEditItemTemplate = (tripItem) => {
   const isSubmitDisabled = tripItem.timeBegin >= tripItem.timeEnd;
+  const isNewForm = !tripItem.id;
   return (`
-    <li class="trip-events__item">
+    <div class="trip-events__item">
       <form class="trip-events__item event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
@@ -84,21 +89,21 @@ const createTripEditItemTemplate = (tripItem) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${tripItem.cost}">
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${tripItem.cost}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? `disabled` : ``}>Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__reset-btn" type="reset">${isNewForm ? `Close` : `Delete`}</button>
 
           <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``}>
-          <label class="event__favorite-btn" for="event-favorite-1">
+          <label class="event__favorite-btn ${isNewForm ? `visually-hidden` : ``}" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
             </svg>
           </label>
 
-          <button class="event__rollup-btn" type="button">
+          <button class="event__rollup-btn ${isNewForm ? `visually-hidden` : ``}" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -122,17 +127,33 @@ const createTripEditItemTemplate = (tripItem) => {
           </section>
         </section>
       </form>
-    </li>
+    </div>
   `);
 };
 
+const typeDefault = typeTripItem[0];
+
+const NEW_TRIP = {
+  id: null,
+  type: typeDefault,
+  city: CITY_TRIP[0],
+  timeBegin: new Date(),
+  timeEnd: new Date(new Date().setHours(new Date().getHours() + 1)),
+  cost: 100,
+  isFavorite: false,
+  offers: getOffersByType(typeDefault),
+  destination: {
+    desc: ``,
+    photo: []
+  }
+};
+
 export default class TripEditItem extends Smart {
-  constructor(tripEditItem) {
+  constructor(tripEditItem = NEW_TRIP) {
     super();
     this._data = Object.assign({}, tripEditItem);
     this._datepickerBegin = null;
     this._datepickerEnd = null;
-    this._setDatepicker();
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
@@ -141,6 +162,7 @@ export default class TripEditItem extends Smart {
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._cityClickHandler = this._cityClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this.restoreHandlers();
   }
 
   restoreHandlers() {
@@ -155,7 +177,7 @@ export default class TripEditItem extends Smart {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._data);
+    this._callback.formSubmit(Object.assign({}, this._data));
   }
 
   _closeClickHandler(evt) {
@@ -176,6 +198,20 @@ export default class TripEditItem extends Smart {
     this.updateData({timeEnd: selectedDates[0]});
   }
 
+  _getFlatpickr(element, msDefaultDate, dateChangeHandler) {
+    return flatpickr(
+        element,
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/Y H:i`,
+          defaultDate: new Date(msDefaultDate) || new Date(),
+          onChange: dateChangeHandler
+        }
+    );
+  }
+
   _setDatepicker() {
     if (this._datepickerBegin) {
       this._datepickerBegin.destroy();
@@ -185,32 +221,8 @@ export default class TripEditItem extends Smart {
       this._datepickerEnd.destroy();
       this._datepickerEnd = null;
     }
-    if (this._data.timeBegin) {
-      this._datepickerBegin = flatpickr(
-          this.getElement().querySelector(`#event-start-time`),
-          {
-            enableTime: true,
-            // eslint-disable-next-line camelcase
-            time_24hr: true,
-            dateFormat: `d/m/Y H:i`,
-            defaultDate: new Date(this._data.timeBegin) || new Date(),
-            onChange: this._timeBeginChangeHandler
-          }
-      );
-    }
-    if (this._data.timeEnd) {
-      this._datepickerEnd = flatpickr(
-          this.getElement().querySelector(`#event-end-time`),
-          {
-            enableTime: true,
-            // eslint-disable-next-line camelcase
-            time_24hr: true,
-            dateFormat: `d/m/Y H:i`,
-            defaultDate: new Date(this._data.timeEnd) || new Date(),
-            onChange: this._timeEndChangeHandler
-          }
-      );
-    }
+    this._datepickerBegin = this._getFlatpickr(this.getElement().querySelector(`#event-start-time`), this._data.timeBegin, this._timeBeginChangeHandler);
+    this._datepickerEnd = this._getFlatpickr(this.getElement().querySelector(`#event-end-time`), this._data.timeEnd, this._timeEndChangeHandler);
   }
 
   _typeClickHandler(evt) {
@@ -238,30 +250,18 @@ export default class TripEditItem extends Smart {
 
   closeEditFormClickHandler(callback) {
     this._callback.editClick = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
   deleteEditFormClickHandler(callback) {
     this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
   }
 
   formEditSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
-  }
-
-  setTypeClickHandler() {
-    Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
-  }
-
-  setCityClickHandler() {
-    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
   }
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 }
 
