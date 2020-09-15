@@ -19,9 +19,7 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-
-    this._tripsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
+    this._clearSort = this._clearSort.bind(this);
 
     this._tripDayListComponent = new TripDayList();
     this._noEventsComponent = new NoItems();
@@ -32,6 +30,8 @@ export default class Trip {
   }
 
   init() {
+    this._tripsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
     if (!this._tripsModel.getTrips().length) {
       this._currentSortType = SORT_DEFAULT;
       this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
@@ -47,14 +47,14 @@ export default class Trip {
     this._clearTrips();
     this._clearSort();
 
+    remove(this._tripDayListComponent);
+
     this._tripsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _clearSort() {
-    if (!this._sortComponent) {
-      remove(this._sortComponent);
-    }
+    remove(this._sortComponent);
     this._sortComponent = null;
   }
 

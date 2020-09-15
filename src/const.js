@@ -52,6 +52,11 @@ export const UserAction = {
   DELETE: `DELETE`
 };
 
+export const MenuItem = {
+  TABLE: `TABLE`,
+  STATS: `STATS`
+};
+
 export const SORT_DEFAULT = SORT.EVENT;
 
 export const FILTER_DEFAULT = FILTER.EVERYTHING;

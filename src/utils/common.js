@@ -56,7 +56,7 @@ export const getDuration = (begin, end) => {
   if (duration.hours() > 0) {
     result.push(`${duration.hours()}h`);
   }
-  if (duration.minutes() > 0) {
+  if (duration.minutes() >= 0) {
     result.push(`${duration.minutes()}m`);
   }
   return result.join(` `);
