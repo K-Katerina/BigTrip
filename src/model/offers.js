@@ -1,26 +1,19 @@
-import Observer from "../utils/observer";
+export default class Offers {
 
-export default class Offers extends Observer {
-  constructor() {
-    super();
-    this._offers = [];
-  }
-
-  setOffers(offers) {
+  static setOffers(offers = []) {
     this._offers = offers.slice();
   }
 
-  getAllOffers() {
+  static getAllOffers() {
     return this._offers;
   }
 
-  getOfferForType(offerType) {
+  static getOfferForType(offerType) {
     const index = this._offers.findIndex((offer) => offer.type === offerType);
 
     if (index === -1) {
       throw new Error(`Not found: "${offerType}"!`);
     }
-    this._notify(offerType);
-    return this._offers[index];
+    return this._offers[index].offers;
   }
 }

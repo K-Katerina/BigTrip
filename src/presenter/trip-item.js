@@ -93,7 +93,6 @@ export default class TripItem {
         isOldTime ? UpdateType.PATCH : UpdateType.MINOR,
         Object.assign({}, this._tripItem, tripItem)
     );
-    this._tripItemView.updateData(this._tripItem);
     this._replaceTripEditItemToTripItem();
   }
 

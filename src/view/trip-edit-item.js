@@ -1,13 +1,10 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo, typeTripItem} from "../const";
+import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, getInOrTo, getBlackTrip} from "../const";
 import flatpickr from "flatpickr";
 import {Smart} from "./smart";
-import {
-  getDesc as getNewDesc,
-  getPhoto as getNewPhoto,
-  getOffers as getOffersByType,
-} from "../mock/trip-item";
+import OffersModel from "../model/offers";
 import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import DestinationsModel from "../model/destination";
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
@@ -19,9 +16,9 @@ const fillTypeGroup = (types) => {
 };
 
 const getOffers = (tripItem) => {
-  return tripItem.offers.map((offer, index) =>
+  return OffersModel.getOfferForType(tripItem.type).map((offer, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${offer.checked ? `checked` : ``}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${tripItem.offers.find((item) => offer.title === item.title) ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${tripItem.type}-${tripItem.id}-${index}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&nbsp;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
@@ -32,7 +29,11 @@ const getOffers = (tripItem) => {
 
 const getPhoto = (photos) => {
   return photos.map((photo) =>
-    `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``);
+    `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``);
+};
+
+const getCity = () => {
+  return DestinationsModel.getDestinations().map((destination) => destination.city);
 };
 
 const createTripEditItemTemplate = (tripItem) => {
@@ -68,7 +69,7 @@ const createTripEditItemTemplate = (tripItem) => {
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${tripItem.city}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${CITY_TRIP.map((city) => `<option value="${city}"></option>\n`).join(``)}
+              ${getCity().map((city) => `<option value="${city}"></option>\n`).join(``)}
             </datalist>
           </div>
 
@@ -116,12 +117,12 @@ const createTripEditItemTemplate = (tripItem) => {
               ${getOffers(tripItem)}
             </div>
           </section>
-          <section class="event__section event__section--destination ${tripItem.destination.desc.length + tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
+          <section class="event__section event__section--destination ${DestinationsModel.getDestinationsForCity(tripItem.city) ? `` : `visually-hidden`}">
             <h3 class="event__section-title event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${tripItem.destination.desc}</p>
-            <div class="event__photos-container ${tripItem.destination.photo.length ? `` : `visually-hidden`}">
+            <p class="event__destination-description">${DestinationsModel.getDestinationsForCity(tripItem.city).desc}</p>
+            <div class="event__photos-container ${DestinationsModel.getDestinationsForCity(tripItem.city).photo.length ? `` : `visually-hidden`}">
               <div class="event__photos-tape">
-                ${getPhoto(tripItem.destination.photo)}
+                ${getPhoto(DestinationsModel.getDestinationsForCity(tripItem.city).photo)}
               </div>
             </div>
           </section>
@@ -131,25 +132,8 @@ const createTripEditItemTemplate = (tripItem) => {
   `);
 };
 
-const typeDefault = typeTripItem[0];
-
-const NEW_TRIP = {
-  id: null,
-  type: typeDefault,
-  city: CITY_TRIP[0],
-  timeBegin: new Date(),
-  timeEnd: new Date(new Date().setHours(new Date().getHours() + 1)),
-  cost: 100,
-  isFavorite: false,
-  offers: getOffersByType(typeDefault),
-  destination: {
-    desc: ``,
-    photo: []
-  }
-};
-
 export default class TripEditItem extends Smart {
-  constructor(tripEditItem = NEW_TRIP) {
+  constructor(tripEditItem = getBlackTrip()) {
     super();
     this._data = Object.assign({}, tripEditItem);
     this._datepickerBegin = null;
@@ -228,14 +212,14 @@ export default class TripEditItem extends Smart {
   _typeClickHandler(evt) {
     evt.preventDefault();
     const type = evt.target.value;
-    this.updateData({type, offers: getOffersByType(type)});
+    this.updateData({type});
   }
 
   _cityClickHandler(evt) {
     evt.preventDefault();
     const city = evt.target.value;
-    const desc = getNewDesc();
-    const photo = getNewPhoto();
+    const desc = DestinationsModel.getDestinationsForCity(city).destination;
+    const photo = DestinationsModel.getDestinationsForCity(city).photo;
     this.updateData({city, destination: {desc, photo}});
   }
 

@@ -1,4 +1,5 @@
 import Observer from "../utils/observer";
+import DestinationModel from "../model/destination";
 
 export default class Trips extends Observer {
   constructor() {
@@ -61,15 +62,15 @@ export default class Trips extends Observer {
         {},
         trip,
         {
-          city: ``,
-          timeBegin: new Date(trip.date_from),
-          timeEnd: new Date(trip.date_to),
+          city: trip.destination.name,
+          timeBegin: trip.date_from !== null ? new Date(trip.date_from) : trip.date_from,
+          timeEnd: trip.date_to !== null ? new Date(trip.date_to) : trip.date_to,
           cost: trip.base_price,
           isFavorite: trip.is_favorite,
-          offers: [],
+          offers: [...trip.offers],
           destination: {
-            desc: ``,
-            photo: [`http://localhost:8080/img/logo.png`]
+            desc: trip.destination.description,
+            photo: [...trip.destination.pictures]
           }
         }
     );
@@ -83,20 +84,31 @@ export default class Trips extends Observer {
   }
 
   static adaptToServer(trip) {
+    const destination = DestinationModel.getDestinationsForCity(trip.city);
+    const adaptedDestination = Object.assign({}, destination, {
+      "name": trip.city,
+      "description": destination.desc,
+      "pictures": destination.photo
+    });
+    delete adaptedDestination.city;
+    delete adaptedDestination.desc;
+    delete adaptedDestination.photo;
+
     const adaptedTrip = Object.assign(
         {},
         trip,
         {
           "base_price": trip.cost,
-          "date_from": new Date(trip.timeBegin),
-          "date_to": new Date(trip.timeEnd),
-          "destination": ``,
+          "date_from": trip.timeBegin instanceof Date ? trip.timeBegin.toISOString() : null,
+          "date_to": trip.timeEnd instanceof Date ? trip.timeEnd.toISOString() : null,
+          "destination": adaptedDestination,
           "is_favorite": trip.isFavorite,
-          "offers": []
+          "offers": trip.offers
         }
     );
 
     delete adaptedTrip.cost;
+    delete adaptedTrip.city;
     delete adaptedTrip.timeBegin;
     delete adaptedTrip.timeEnd;
     delete adaptedTrip.isFavorite;

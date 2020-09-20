@@ -1,25 +1,5 @@
 import moment from "moment";
 
-export const getRandomNumberOfRange = (a, b) => {
-  return Math.round(a + Math.random() * (b - a));
-};
-
-export const getRandomArray = (array) => {
-  return shuffle(array).slice(0, getRandomNumberOfRange(0, array.length));
-};
-
-export const getRandomItemFromArray = (array) => {
-  return shuffle(array)[0];
-};
-
-const shuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
-
 export const getBeginningOfDay = (ms) => {
   const date = new Date(ms);
   date.setHours(0);

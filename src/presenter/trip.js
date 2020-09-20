@@ -12,10 +12,11 @@ import NewItemTrip from "./new-item-trip";
 import LoadingView from "../view/loading";
 
 export default class Trip {
-  constructor(container, tripsModel, filterModel) {
+  constructor(container, tripsModel, filterModel, api) {
     this._container = container;
     this._tripsModel = tripsModel;
     this._filterModel = filterModel;
+    this._api = api;
     this._eventChangeHandler = this._eventChangeHandler.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -33,7 +34,6 @@ export default class Trip {
   }
 
   init() {
-    // debugger
     this._tripsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
     if (this._isLoading) {
@@ -118,7 +118,9 @@ export default class Trip {
         this._tripsModel.addTripItem(updateType, update);
         break;
       case UserAction.UPDATE:
-        this._tripsModel.updateTripItem(updateType, update);
+        this._api.updateTrip(update).then((response) => {
+          this._tripsModel.updateTripItem(updateType, response);
+        });
         break;
       case UserAction.DELETE:
         this._tripsModel.deleteTripItem(updateType, update);

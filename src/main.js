@@ -10,36 +10,35 @@ import Menu from "./view/menu";
 import Stats from "./view/stats";
 import Api from "./api";
 
-const AUTHORIZATION = `Basic ` + Math.random().toString();
+const AUTHORIZATION = `Basic mjegduhebjebkjecbn`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const tripsModel = new TripsModel();
 const filterModel = new FilterModel();
 const api = new Api(END_POINT, AUTHORIZATION);
 
-api.getTrips()
+const body = document.querySelector(`.page-body`);
+const tripMainView = body.querySelector(`.trip-main`);
+const tripControlsView = tripMainView.querySelector(`.trip-controls`);
+const menuComponent = new Menu();
+render(tripControlsView, menuComponent, RenderPosition.BEFOREEND);
+menuComponent.setMenuItem(MenuItem.TABLE);
+
+api.getAllData()
   .then((trips) => {
     tripsModel.setTrips(UpdateType.INIT, trips);
+    const tripInfoView = new TripInfo(tripsModel.getTrips());
+    render(tripMainView, tripInfoView, RenderPosition.AFTERBEGIN);
+    render(tripInfoView, new TripInfoCost(tripsModel.getTrips()), RenderPosition.BEFOREEND);
   })
   .catch(() => {
     tripsModel.setTrips(UpdateType.INIT, []);
   });
 
-const body = document.querySelector(`.page-body`);
-const tripMainView = body.querySelector(`.trip-main`);
-const tripInfoView = new TripInfo(tripsModel.getTrips());
-render(tripMainView, tripInfoView, RenderPosition.AFTERBEGIN);
-render(tripInfoView, new TripInfoCost(tripsModel.getTrips()), RenderPosition.BEFOREEND);
-const tripControlsView = tripMainView.querySelector(`.trip-controls`);
-const menuComponent = new Menu();
-render(tripControlsView, menuComponent, RenderPosition.BEFOREEND);
-const tripPresenter = new TripPresenter(body.querySelector(`.trip-events`), tripsModel, filterModel);
-
-
+const tripPresenter = new TripPresenter(body.querySelector(`.trip-events`), tripsModel, filterModel, api);
 const filterPresenter = new FilterPresenter(tripControlsView, filterModel, tripsModel);
-filterPresenter.init();
 
-menuComponent.setMenuItem(MenuItem.TABLE);
+filterPresenter.init();
 tripPresenter.init();
 let statsComponent = null;
 
