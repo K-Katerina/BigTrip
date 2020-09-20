@@ -9,6 +9,7 @@ import NoItems from "../view/no-items";
 import Sort from "../view/sort";
 import TripItem from "./trip-item";
 import NewItemTrip from "./new-item-trip";
+import LoadingView from "../view/loading";
 
 export default class Trip {
   constructor(container, tripsModel, filterModel) {
@@ -27,17 +28,25 @@ export default class Trip {
     this._newTripItem = new NewItemTrip(this._container, this._eventChangeHandler);
     this._currentSortType = SORT_DEFAULT;
     this._eventPresenter = {};
+    this._isLoading = true;
+    this._loadingComponent = new LoadingView();
   }
 
   init() {
+    // debugger
     this._tripsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    if (this._isLoading) {
+      render(this._container, this._loadingComponent, RenderPosition.AFTERBEGIN);
+      return;
+    }
     if (!this._tripsModel.getTrips().length) {
       this._currentSortType = SORT_DEFAULT;
-      this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
+      this._filterModel.setFilter(UpdateType.PATCH, FILTER_DEFAULT);
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND);
       return;
     }
+    remove(this._noEventsComponent);
     this._renderSort();
     this._renderDayList();
     this._renderEventList();
@@ -48,6 +57,7 @@ export default class Trip {
     this._clearSort();
 
     remove(this._tripDayListComponent);
+    remove(this._loadingComponent);
 
     this._tripsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
@@ -87,6 +97,11 @@ export default class Trip {
         // - обновить весь маршрут (например, при переключении фильтра)
         this._currentSortType = SORT_DEFAULT;
         this._clearTrips();
+        this.init();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this.init();
         break;
     }

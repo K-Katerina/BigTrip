@@ -1,6 +1,6 @@
 import {remove, render, RenderPosition} from "../utils/render";
 import TripEditItem from "../view/trip-edit-item";
-import {getId} from "../mock/trip-item";
+import {getId} from "../utils/common";
 import {UpdateType, UserAction} from "../const";
 
 export default class NewItemTrip {

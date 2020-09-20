@@ -55,4 +55,52 @@ export default class Trips extends Observer {
 
     this._notify(updateType);
   }
+
+  static adaptToClient(trip) {
+    const adaptedTrip = Object.assign(
+        {},
+        trip,
+        {
+          city: ``,
+          timeBegin: new Date(trip.date_from),
+          timeEnd: new Date(trip.date_to),
+          cost: trip.base_price,
+          isFavorite: trip.is_favorite,
+          offers: [],
+          destination: {
+            desc: ``,
+            photo: [`http://localhost:8080/img/logo.png`]
+          }
+        }
+    );
+
+    delete adaptedTrip.date_from;
+    delete adaptedTrip.date_to;
+    delete adaptedTrip.base_price;
+    delete adaptedTrip.is_favorite;
+
+    return adaptedTrip;
+  }
+
+  static adaptToServer(trip) {
+    const adaptedTrip = Object.assign(
+        {},
+        trip,
+        {
+          "base_price": trip.cost,
+          "date_from": new Date(trip.timeBegin),
+          "date_to": new Date(trip.timeEnd),
+          "destination": ``,
+          "is_favorite": trip.isFavorite,
+          "offers": []
+        }
+    );
+
+    delete adaptedTrip.cost;
+    delete adaptedTrip.timeBegin;
+    delete adaptedTrip.timeEnd;
+    delete adaptedTrip.isFavorite;
+
+    return adaptedTrip;
+  }
 }

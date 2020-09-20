@@ -1,4 +1,3 @@
-import {generateTripItemArray} from "./mock/trip-item";
 import {remove, render, RenderPosition} from "./utils/render";
 import {MenuItem, UpdateType} from "./const";
 import TripsModel from "./model/trips";
@@ -9,12 +8,22 @@ import TripInfo from "./view/trip-info.js";
 import TripInfoCost from "./view/trip-info-cost";
 import Menu from "./view/menu";
 import Stats from "./view/stats";
+import Api from "./api";
 
-export const TRIP_ITEMS = 10;
+const AUTHORIZATION = `Basic ` + Math.random().toString();
+const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const tripsModel = new TripsModel();
 const filterModel = new FilterModel();
-tripsModel.setTrips(UpdateType.MAJOR, generateTripItemArray(TRIP_ITEMS));
+const api = new Api(END_POINT, AUTHORIZATION);
+
+api.getTrips()
+  .then((trips) => {
+    tripsModel.setTrips(UpdateType.INIT, trips);
+  })
+  .catch(() => {
+    tripsModel.setTrips(UpdateType.INIT, []);
+  });
 
 const body = document.querySelector(`.page-body`);
 const tripMainView = body.querySelector(`.trip-main`);

@@ -65,3 +65,5 @@ export const getDuration = (begin, end) => {
 export const capitalizeWord = (word) => {
   return word.charAt(0).toUpperCase() + word.slice(1);
 };
+
+export const getId = () => Date.now() + parseInt(Math.random() * 10000, 10);
