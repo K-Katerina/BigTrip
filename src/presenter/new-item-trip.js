@@ -25,6 +25,7 @@ export default class NewItemTrip {
 
     render(this._container, this._tripEditItemComponent, RenderPosition.AFTERFIRSTCHILD);
 
+    document.querySelector(`.trip-main__event-add-btn`).setAttribute(`disabled`, `true`);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 
@@ -34,6 +35,7 @@ export default class NewItemTrip {
     }
     remove(this._tripEditItemComponent);
     this._tripEditItemComponent = null;
+    document.querySelector(`.trip-main__event-add-btn`).removeAttribute(`disabled`);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 

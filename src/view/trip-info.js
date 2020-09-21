@@ -3,8 +3,8 @@ import AbstractView from "./abstract-view";
 
 const getTitle = (trips) => {
   if (trips.length) {
-    const firstCity = trips[0].city;
-    const lastCity = trips[trips.length - 1].city;
+    const firstCity = trips.slice().sort((a, b) => a.timeBegin - b.timeBegin)[0].city;
+    const lastCity = trips.slice().sort((a, b) => b.timeEnd - a.timeEnd)[0].city;
     const allCities = [...new Set(trips.map((trip) => trip.city))];
     return allCities.length > 3 ? firstCity + ` &mdash;... &mdash; ` + lastCity : allCities.join(` &mdash; `);
   }

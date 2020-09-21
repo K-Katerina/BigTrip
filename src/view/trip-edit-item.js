@@ -5,6 +5,8 @@ import OffersModel from "../model/offers";
 import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import DestinationsModel from "../model/destination";
+import he from "he";
+
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
@@ -67,7 +69,7 @@ const createTripEditItemTemplate = (tripItem) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${capitalizeWord(tripItem.type)} ${getInOrTo(tripItem.type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${tripItem.city}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(tripItem.city)}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${getCity().map((city) => `<option value="${city}"></option>\n`).join(``)}
             </datalist>
@@ -110,7 +112,7 @@ const createTripEditItemTemplate = (tripItem) => {
         </header>
 
         <section class="event__details">
-          <section class="event__section event__section--offers">
+          <section class="event__section event__section--offers ${tripItem.offers.length ? `` : `visually-hidden`}">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">

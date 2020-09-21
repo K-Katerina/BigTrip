@@ -22,6 +22,7 @@ export default class TripItem {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._handleSubmitClick = this._handleSubmitClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
   init(tripItem) {
