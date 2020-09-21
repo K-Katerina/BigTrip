@@ -64,6 +64,7 @@ export default class Trip {
   }
 
   _clearSort() {
+    this._currentSortType = SORT_DEFAULT;
     remove(this._sortComponent);
     this._sortComponent = null;
   }
@@ -174,7 +175,7 @@ export default class Trip {
     if (this._sortComponent) {
       remove(this._sortComponent);
     }
-    this._sortComponent = new Sort();
+    this._sortComponent = new Sort(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
     render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN);
   }

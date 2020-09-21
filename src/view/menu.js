@@ -1,11 +1,12 @@
 import AbstractView from "./abstract-view";
 import {MenuItem} from "../const";
+import {capitalizeWord} from "../utils/common";
 
 const createMenuTemplate = () => {
   return (`
     <nav class="trip-controls__trip-tabs  trip-tabs">
-      <a class="trip-tabs__btn  trip-tabs__btn--active" data-menu-item="${MenuItem.TABLE}" href="#">${MenuItem.TABLE}</a>
-      <a class="trip-tabs__btn" data-menu-item="${MenuItem.STATS}" href="#">${MenuItem.STATS}</a>
+      <a class="trip-tabs__btn  trip-tabs__btn--active" data-menu-item="${MenuItem.TABLE}" href="#">${capitalizeWord(MenuItem.TABLE)}</a>
+      <a class="trip-tabs__btn" data-menu-item="${MenuItem.STATS}" href="#">${capitalizeWord(MenuItem.STATS)}</a>
     </nav>
   `);
 };

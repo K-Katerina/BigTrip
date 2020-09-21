@@ -41,7 +41,7 @@ export default class NewItemTrip {
     this._addData(
         UserAction.ADD,
         UpdateType.MAJOR,
-        Object.assign({id: getId()}, trip)
+        Object.assign({}, trip, {id: getId()})
     );
     this.destroy();
   }

@@ -27,9 +27,9 @@ const createSortTemplate = (currentSortType = SORT.EVENT) => {
 };
 
 export default class Sort extends Smart {
-  constructor() {
+  constructor(currentSortType = SORT_DEFAULT) {
     super();
-    this._currentSortType = SORT_DEFAULT;
+    this._currentSortType = currentSortType;
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
     this.restoreHandlers();
   }

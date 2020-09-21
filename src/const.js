@@ -32,8 +32,8 @@ export const UserAction = {
 };
 
 export const MenuItem = {
-  TABLE: `TABLE`,
-  STATS: `STATS`
+  TABLE: `table`,
+  STATS: `stats`
 };
 
 const typeDefault = typeTripItem[0];

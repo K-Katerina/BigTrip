@@ -146,6 +146,8 @@ export default class TripEditItem extends Smart {
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._cityClickHandler = this._cityClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._costChangeHandler = this._costChangeHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this.restoreHandlers();
   }
 
@@ -157,6 +159,21 @@ export default class TripEditItem extends Smart {
     Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._costChangeHandler);
+    Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`)).forEach((eventOffer) => eventOffer.addEventListener(`click`, this._offersChangeHandler));
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepickerBegin) {
+      this._datepickerBegin.destroy();
+      this._datepickerBegin = null;
+    }
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
   }
 
   _formSubmitHandler(evt) {
@@ -215,6 +232,19 @@ export default class TripEditItem extends Smart {
     this.updateData({type});
   }
 
+  _offersChangeHandler(evt) {
+    evt.preventDefault();
+    const offerChanged = OffersModel.getOfferForType(this._data.type).find((offer) =>
+      offer.title === this.getElement().querySelector(`label[for="${evt.target.id}"] .event__offer-title`).textContent);
+    let updatedOffers = [];
+    if (evt.target.checked) {
+      updatedOffers = [...this._data.offers, offerChanged];
+    } else {
+      updatedOffers = [...this._data.offers.filter((offer) => offer.title !== offerChanged.title)];
+    }
+    this.updateData({offers: updatedOffers});
+  }
+
   _cityClickHandler(evt) {
     evt.preventDefault();
     const city = evt.target.value;
@@ -225,7 +255,13 @@ export default class TripEditItem extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+    this.updateData({isFavorite: !this._data.isFavorite});
     this._callback.favoriteClick();
+  }
+
+  _costChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({cost: evt.target.value});
   }
 
   getTemplate() {

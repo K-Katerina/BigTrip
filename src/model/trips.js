@@ -65,7 +65,7 @@ export default class Trips extends Observer {
           city: trip.destination.name,
           timeBegin: trip.date_from !== null ? new Date(trip.date_from) : trip.date_from,
           timeEnd: trip.date_to !== null ? new Date(trip.date_to) : trip.date_to,
-          cost: trip.base_price,
+          cost: +trip.base_price,
           isFavorite: trip.is_favorite,
           offers: [...trip.offers],
           destination: {
@@ -98,7 +98,7 @@ export default class Trips extends Observer {
         {},
         trip,
         {
-          "base_price": trip.cost,
+          "base_price": +trip.cost,
           "date_from": trip.timeBegin instanceof Date ? trip.timeBegin.toISOString() : null,
           "date_to": trip.timeEnd instanceof Date ? trip.timeEnd.toISOString() : null,
           "destination": adaptedDestination,
