@@ -22,6 +22,7 @@ export default class TripItem {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._handleSubmitClick = this._handleSubmitClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
   init(tripItem) {
@@ -50,7 +51,8 @@ export default class TripItem {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._tripEditItemView, prevEditItemView);
+      replace(this._tripItemView, prevEditItemView);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevTripItemView);
@@ -88,20 +90,21 @@ export default class TripItem {
 
   _handleSubmitClick(tripItem) {
     const isOldTime = this._tripItem.timeBegin === tripItem.timeBegin && this._tripItem.timeEnd === tripItem.timeEnd;
+    const isOldCost = this._tripItem.cost === tripItem.cost;
     this._changeData(
         UserAction.UPDATE,
-        isOldTime ? UpdateType.PATCH : UpdateType.MINOR,
+        isOldTime && isOldCost ? UpdateType.PATCH : UpdateType.MINOR,
         Object.assign({}, this._tripItem, tripItem)
     );
-    this._tripItemView.updateData(this._tripItem);
     this._replaceTripEditItemToTripItem();
   }
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE,
+        null,
         Object.assign({}, this._tripItem, {isFavorite: !this._tripItem.isFavorite})
     );
-    this._tripEditItemView.updateData({isFavorite: this._tripItem.isFavorite});
   }
 
   _replaceTripItemToTripEditItem() {

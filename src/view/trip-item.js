@@ -1,29 +1,14 @@
 import {parseTime, getDuration, capitalizeWord} from "../utils/common";
-import {CITY_TRIP, getInOrTo, OFFERS, TYPE_TRIP_ITEM_TO} from "../const";
+import {getInOrTo} from "../const";
 import {Smart} from "./smart";
 
 let MAX_OFFERS = 3;
 
-const BLANK_TRIP_ITEM = {
-  type: TYPE_TRIP_ITEM_TO[0],
-  city: CITY_TRIP[0],
-  timeBegin: Date.now(),
-  timeEnd: Date.now(),
-  cost: 0,
-  favorite: false,
-  offers: OFFERS,
-  destination: {
-    desc: ``,
-    photo: ``
-  }
-};
-
 const getOffers = (offers) => {
-  const checkedOffers = offers.filter((offer) => offer.checked);
   return (
-    checkedOffers.length > 0 ?
+    offers.length > 0 ?
       `<ul class="event__selected-offers">
-      ${checkedOffers.slice(0, Math.min(MAX_OFFERS, checkedOffers.length)).map((offer) =>
+      ${offers.slice(0, Math.min(MAX_OFFERS, offers.length)).map((offer) =>
       `<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
           &plus;&nbsp;&euro;&nbsp;
@@ -66,7 +51,7 @@ const createTripItemTemplate = (tripItem) => {
 };
 
 export default class TripItem extends Smart {
-  constructor(tripItem = BLANK_TRIP_ITEM) {
+  constructor(tripItem) {
     super();
     this._tripItem = tripItem;
     this._openEditFormClickHandler = this._openEditFormClickHandler.bind(this);

@@ -9,12 +9,14 @@ import NoItems from "../view/no-items";
 import Sort from "../view/sort";
 import TripItem from "./trip-item";
 import NewItemTrip from "./new-item-trip";
+import LoadingView from "../view/loading";
 
 export default class Trip {
-  constructor(container, tripsModel, filterModel) {
+  constructor(container, tripsModel, filterModel, api) {
     this._container = container;
     this._tripsModel = tripsModel;
     this._filterModel = filterModel;
+    this._api = api;
     this._eventChangeHandler = this._eventChangeHandler.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -27,17 +29,24 @@ export default class Trip {
     this._newTripItem = new NewItemTrip(this._container, this._eventChangeHandler);
     this._currentSortType = SORT_DEFAULT;
     this._eventPresenter = {};
+    this._isLoading = true;
+    this._loadingComponent = new LoadingView();
   }
 
   init() {
     this._tripsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    if (this._isLoading) {
+      render(this._container, this._loadingComponent, RenderPosition.AFTERBEGIN);
+      return;
+    }
     if (!this._tripsModel.getTrips().length) {
       this._currentSortType = SORT_DEFAULT;
-      this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
+      this._filterModel.setFilter(UpdateType.PATCH, FILTER_DEFAULT);
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND);
       return;
     }
+    remove(this._noEventsComponent);
     this._renderSort();
     this._renderDayList();
     this._renderEventList();
@@ -48,12 +57,14 @@ export default class Trip {
     this._clearSort();
 
     remove(this._tripDayListComponent);
+    remove(this._loadingComponent);
 
     this._tripsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _clearSort() {
+    this._currentSortType = SORT_DEFAULT;
     remove(this._sortComponent);
     this._sortComponent = null;
   }
@@ -89,6 +100,11 @@ export default class Trip {
         this._clearTrips();
         this.init();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this.init();
+        break;
     }
   }
 
@@ -103,7 +119,9 @@ export default class Trip {
         this._tripsModel.addTripItem(updateType, update);
         break;
       case UserAction.UPDATE:
-        this._tripsModel.updateTripItem(updateType, update);
+        this._api.updateTrip(update).then((response) => {
+          this._tripsModel.updateTripItem(updateType, response);
+        });
         break;
       case UserAction.DELETE:
         this._tripsModel.deleteTripItem(updateType, update);
@@ -157,7 +175,7 @@ export default class Trip {
     if (this._sortComponent) {
       remove(this._sortComponent);
     }
-    this._sortComponent = new Sort();
+    this._sortComponent = new Sort(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
     render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN);
   }

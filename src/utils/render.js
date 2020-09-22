@@ -28,14 +28,6 @@ export const render = (container, child, place) => {
   }
 };
 
-export const renderTemplate = (container, template, place) => {
-  if (container instanceof AbstractView) {
-    container = container.getElement();
-  }
-
-  container.insertAdjacentHTML(place, template);
-};
-
 export const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
@@ -59,33 +51,6 @@ export const replace = (newChild, oldChild) => {
   }
 
   parent.replaceChild(newChild, oldChild);
-};
-
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
-};
-
-export const deleteItem = (items, deleted) => {
-  const index = items.findIndex((item) => item.id === deleted.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    ...items.slice(index + 1)
-  ];
 };
 
 export const remove = (component) => {

@@ -1,13 +1,12 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, CITY_TRIP, getInOrTo, typeTripItem} from "../const";
+import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, getInOrTo, getBlackTrip} from "../const";
 import flatpickr from "flatpickr";
 import {Smart} from "./smart";
-import {
-  getDesc as getNewDesc,
-  getPhoto as getNewPhoto,
-  getOffers as getOffersByType,
-} from "../mock/trip-item";
+import OffersModel from "../model/offers";
 import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import DestinationsModel from "../model/destination";
+import he from "he";
+
 
 const fillTypeGroup = (types) => {
   return types.map((typeTrip) =>
@@ -19,9 +18,9 @@ const fillTypeGroup = (types) => {
 };
 
 const getOffers = (tripItem) => {
-  return tripItem.offers.map((offer, index) =>
+  return OffersModel.getOfferForType(tripItem.type).map((offer, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${offer.checked ? `checked` : ``}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${tripItem.offers.find((item) => offer.title === item.title) ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${tripItem.type}-${tripItem.id}-${index}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&nbsp;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
@@ -32,7 +31,11 @@ const getOffers = (tripItem) => {
 
 const getPhoto = (photos) => {
   return photos.map((photo) =>
-    `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``);
+    `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``);
+};
+
+const getCity = () => {
+  return DestinationsModel.getDestinations().map((destination) => destination.city);
 };
 
 const createTripEditItemTemplate = (tripItem) => {
@@ -66,9 +69,9 @@ const createTripEditItemTemplate = (tripItem) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${capitalizeWord(tripItem.type)} ${getInOrTo(tripItem.type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${tripItem.city}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(tripItem.city)}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${CITY_TRIP.map((city) => `<option value="${city}"></option>\n`).join(``)}
+              ${getCity().map((city) => `<option value="${city}"></option>\n`).join(``)}
             </datalist>
           </div>
 
@@ -109,19 +112,19 @@ const createTripEditItemTemplate = (tripItem) => {
         </header>
 
         <section class="event__details">
-          <section class="event__section event__section--offers">
+          <section class="event__section event__section--offers ${tripItem.offers.length ? `` : `visually-hidden`}">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
               ${getOffers(tripItem)}
             </div>
           </section>
-          <section class="event__section event__section--destination ${tripItem.destination.desc.length + tripItem.destination.photo.length > 0 ? `` : `visually-hidden`}">
+          <section class="event__section event__section--destination ${DestinationsModel.getDestinationsForCity(tripItem.city) ? `` : `visually-hidden`}">
             <h3 class="event__section-title event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${tripItem.destination.desc}</p>
-            <div class="event__photos-container ${tripItem.destination.photo.length ? `` : `visually-hidden`}">
+            <p class="event__destination-description">${DestinationsModel.getDestinationsForCity(tripItem.city).desc}</p>
+            <div class="event__photos-container ${DestinationsModel.getDestinationsForCity(tripItem.city).photo.length ? `` : `visually-hidden`}">
               <div class="event__photos-tape">
-                ${getPhoto(tripItem.destination.photo)}
+                ${getPhoto(DestinationsModel.getDestinationsForCity(tripItem.city).photo)}
               </div>
             </div>
           </section>
@@ -131,25 +134,8 @@ const createTripEditItemTemplate = (tripItem) => {
   `);
 };
 
-const typeDefault = typeTripItem[0];
-
-const NEW_TRIP = {
-  id: null,
-  type: typeDefault,
-  city: CITY_TRIP[0],
-  timeBegin: new Date(),
-  timeEnd: new Date(new Date().setHours(new Date().getHours() + 1)),
-  cost: 100,
-  isFavorite: false,
-  offers: getOffersByType(typeDefault),
-  destination: {
-    desc: ``,
-    photo: []
-  }
-};
-
 export default class TripEditItem extends Smart {
-  constructor(tripEditItem = NEW_TRIP) {
+  constructor(tripEditItem = getBlackTrip()) {
     super();
     this._data = Object.assign({}, tripEditItem);
     this._datepickerBegin = null;
@@ -162,6 +148,8 @@ export default class TripEditItem extends Smart {
     this._typeClickHandler = this._typeClickHandler.bind(this);
     this._cityClickHandler = this._cityClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._costChangeHandler = this._costChangeHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this.restoreHandlers();
   }
 
@@ -173,6 +161,21 @@ export default class TripEditItem extends Smart {
     Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._costChangeHandler);
+    Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`)).forEach((eventOffer) => eventOffer.addEventListener(`click`, this._offersChangeHandler));
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepickerBegin) {
+      this._datepickerBegin.destroy();
+      this._datepickerBegin = null;
+    }
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
   }
 
   _formSubmitHandler(evt) {
@@ -228,20 +231,39 @@ export default class TripEditItem extends Smart {
   _typeClickHandler(evt) {
     evt.preventDefault();
     const type = evt.target.value;
-    this.updateData({type, offers: getOffersByType(type)});
+    this.updateData({type});
+  }
+
+  _offersChangeHandler(evt) {
+    evt.preventDefault();
+    const offerChanged = OffersModel.getOfferForType(this._data.type).find((offer) =>
+      offer.title === this.getElement().querySelector(`label[for="${evt.target.id}"] .event__offer-title`).textContent);
+    let updatedOffers = [];
+    if (evt.target.checked) {
+      updatedOffers = [...this._data.offers, offerChanged];
+    } else {
+      updatedOffers = [...this._data.offers.filter((offer) => offer.title !== offerChanged.title)];
+    }
+    this.updateData({offers: updatedOffers});
   }
 
   _cityClickHandler(evt) {
     evt.preventDefault();
     const city = evt.target.value;
-    const desc = getNewDesc();
-    const photo = getNewPhoto();
+    const desc = DestinationsModel.getDestinationsForCity(city).destination;
+    const photo = DestinationsModel.getDestinationsForCity(city).photo;
     this.updateData({city, destination: {desc, photo}});
   }
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+    this.updateData({isFavorite: !this._data.isFavorite});
     this._callback.favoriteClick();
+  }
+
+  _costChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({cost: evt.target.value});
   }
 
   getTemplate() {
