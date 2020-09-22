@@ -38,6 +38,13 @@ export default class NewItemTrip {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._tripEditItemComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
   _handleFormSubmit(trip) {
     this._addData(
         UserAction.ADD,
@@ -45,7 +52,7 @@ export default class NewItemTrip {
         trip
         // Object.assign({}, trip, {id: getId()})
     );
-    this.destroy();
+    // this.destroy();
   }
 
   _handleCloseClick() {

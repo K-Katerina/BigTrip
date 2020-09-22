@@ -7,7 +7,7 @@ import TripEventsList from "../view/trip-events-list";
 import TripDayList from "../view/trip-day-list";
 import NoItems from "../view/no-items";
 import Sort from "../view/sort";
-import TripItem from "./trip-item";
+import TripItem, {State} from "./trip-item";
 import NewItemTrip from "./new-item-trip";
 import LoadingView from "../view/loading";
 
@@ -116,16 +116,19 @@ export default class Trip {
   _eventChangeHandler(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.ADD:
+        this._newTripItem.setSaving();
         this._api.addTrip(update).then((response) => {
           this._tripsModel.addTripItem(updateType, response);
         });
         break;
       case UserAction.UPDATE:
+        this._eventPresenter[update.id].setViewState(State.SAVING);
         this._api.updateTrip(update).then((response) => {
           this._tripsModel.updateTripItem(updateType, response);
         });
         break;
       case UserAction.DELETE:
+        this._eventPresenter[update.id].setViewState(State.DELETING);
         this._api.deleteTrip(update).then(() => {
           this._tripsModel.deleteTripItem(updateType, update);
         });
