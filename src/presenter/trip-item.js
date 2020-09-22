@@ -10,7 +10,8 @@ const Mode = {
 
 export const State = {
   SAVING: `SAVING`,
-  DELETING: `DELETING`
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
 };
 
 export default class TripItem {
@@ -76,6 +77,13 @@ export default class TripItem {
   }
 
   setViewState(state) {
+    const resetFormState = () => {
+      this._tripEditItemView.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
     switch (state) {
       case State.SAVING:
         this._tripEditItemView.updateData({
@@ -88,6 +96,10 @@ export default class TripItem {
           isDisabled: true,
           isDeleting: true
         });
+        break;
+      case State.ABORTING:
+        this._tripItemView.shake(resetFormState);
+        this._tripEditItemView.shake(resetFormState);
         break;
     }
   }
@@ -118,7 +130,6 @@ export default class TripItem {
         isOldTime && isOldCost ? UpdateType.PATCH : UpdateType.MINOR,
         Object.assign({}, this._tripItem, tripItem)
     );
-    // this._replaceTripEditItemToTripItem();
   }
 
   _handleFavoriteClick() {

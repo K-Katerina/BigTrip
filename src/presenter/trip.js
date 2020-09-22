@@ -86,16 +86,13 @@ export default class Trip {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
         this._eventPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда что-то было удалено/добавлено)
         this._clearTrips();
         this.init();
         break;
       case UpdateType.MAJOR:
-        // - обновить весь маршрут (например, при переключении фильтра)
         this._currentSortType = SORT_DEFAULT;
         this._clearTrips();
         this.init();
@@ -119,18 +116,24 @@ export default class Trip {
         this._newTripItem.setSaving();
         this._api.addTrip(update).then((response) => {
           this._tripsModel.addTripItem(updateType, response);
+        }).catch(() => {
+          this._newTripItem.setAborting();
         });
         break;
       case UserAction.UPDATE:
         this._eventPresenter[update.id].setViewState(State.SAVING);
         this._api.updateTrip(update).then((response) => {
           this._tripsModel.updateTripItem(updateType, response);
+        }).catch(() => {
+          this._eventPresenter[update.id].setViewState(State.ABORTING);
         });
         break;
       case UserAction.DELETE:
         this._eventPresenter[update.id].setViewState(State.DELETING);
         this._api.deleteTrip(update).then(() => {
           this._tripsModel.deleteTripItem(updateType, update);
+        }).catch(() => {
+          this._eventPresenter[update.id].setViewState(State.ABORTING);
         });
         break;
     }

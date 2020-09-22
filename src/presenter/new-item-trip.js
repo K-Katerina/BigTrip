@@ -45,14 +45,24 @@ export default class NewItemTrip {
     });
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this._tripEditItemComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._tripEditItemComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(trip) {
     this._addData(
         UserAction.ADD,
         UpdateType.MAJOR,
         trip
-        // Object.assign({}, trip, {id: getId()})
     );
-    // this.destroy();
   }
 
   _handleCloseClick() {
