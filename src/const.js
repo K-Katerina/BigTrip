@@ -1,5 +1,4 @@
 import DestinationsModel from "./model/destination";
-import OffersModel from "./model/offers";
 
 export const TYPE_TRIP_ITEM_TO = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
 export const TYPE_TRIP_ITEM_IN = [`check-in`, `sightseeing`, `restaurant`];
@@ -38,6 +37,8 @@ export const MenuItem = {
 
 const typeDefault = typeTripItem[0];
 
+const DEFAULT_COST = 100;
+
 export const getBlackTrip = () => {
   return {
     id: null,
@@ -45,7 +46,7 @@ export const getBlackTrip = () => {
     city: DestinationsModel.getDestinations()[0].city,
     timeBegin: new Date(),
     timeEnd: new Date(new Date().setHours(new Date().getHours() + 1)),
-    cost: 100,
+    cost: DEFAULT_COST,
     isFavorite: false,
     offers: [],
     destination: {

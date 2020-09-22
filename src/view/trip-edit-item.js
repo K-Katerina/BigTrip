@@ -1,11 +1,11 @@
 import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, getInOrTo, getBlackTrip} from "../const";
 import flatpickr from "flatpickr";
+import he from "he";
+import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import {Smart} from "./smart";
 import OffersModel from "../model/offers";
-import {parseTime, parseDate, capitalizeWord} from "../utils/common";
-import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import DestinationsModel from "../model/destination";
-import he from "he";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 
 const fillTypeGroup = (types) => {
@@ -17,10 +17,10 @@ const fillTypeGroup = (types) => {
   ).join(``);
 };
 
-const getOffers = (tripItem) => {
+const getOffers = (tripItem, isDisabled) => {
   return OffersModel.getOfferForType(tripItem.type).map((offer, index) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${tripItem.offers.find((item) => offer.title === item.title) ? `checked` : ``}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${tripItem.offers.find((item) => offer.title === item.title) ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
       <label class="event__offer-label" for="event-offer-${tripItem.type}-${tripItem.id}-${index}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&nbsp;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
@@ -39,8 +39,10 @@ const getCity = () => {
 };
 
 const createTripEditItemTemplate = (tripItem) => {
-  const isSubmitDisabled = tripItem.timeBegin >= tripItem.timeEnd;
+  const {isDisabled} = tripItem;
+  const isSubmitDisabled = tripItem.timeBegin >= tripItem.timeEnd || tripItem.isDeleting;
   const isNewForm = !tripItem.id;
+  const deleteText = tripItem.isDeleting ? `Deleting...` : `Delete`;
   return (`
     <div class="trip-events__item">
       <form class="trip-events__item event event--edit" action="#" method="post">
@@ -50,7 +52,7 @@ const createTripEditItemTemplate = (tripItem) => {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${tripItem.type.toLowerCase()}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -69,7 +71,7 @@ const createTripEditItemTemplate = (tripItem) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${capitalizeWord(tripItem.type)} ${getInOrTo(tripItem.type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(tripItem.city)}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(tripItem.city)}" list="destination-list-1" ${isDisabled ? `disabled` : ``}>
             <datalist id="destination-list-1">
               ${getCity().map((city) => `<option value="${city}"></option>\n`).join(``)}
             </datalist>
@@ -79,12 +81,12 @@ const createTripEditItemTemplate = (tripItem) => {
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time" type="text" required name="event-start-time" value="${parseDate(tripItem.timeBegin)} ${parseTime(tripItem.timeBegin)}">
+            <input class="event__input  event__input--time" id="event-start-time" type="text" required name="event-start-time" value="${parseDate(tripItem.timeBegin)} ${parseTime(tripItem.timeBegin)}" ${isDisabled ? `disabled` : ``}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time" type="text" required name="event-end-time" value="${parseDate(tripItem.timeEnd)} ${parseTime(tripItem.timeEnd)}">
+            <input class="event__input  event__input--time" id="event-end-time" type="text" required name="event-end-time" value="${parseDate(tripItem.timeEnd)} ${parseTime(tripItem.timeEnd)}" ${isDisabled ? `disabled` : ``}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -92,31 +94,31 @@ const createTripEditItemTemplate = (tripItem) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${tripItem.cost}">
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${tripItem.cost}" ${isDisabled ? `disabled` : ``}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? `disabled` : ``}>Save</button>
-          <button class="event__reset-btn" type="reset">${isNewForm ? `Close` : `Delete`}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? `disabled` : ``}>${tripItem.isSaving ? `Saving...` : `Save`}</button>
+          <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isNewForm ? `Close` : deleteText}</button>
 
-          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``}>
-          <label class="event__favorite-btn ${isNewForm ? `visually-hidden` : ``}" for="event-favorite-1">
+          ${isNewForm ? `` : `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
+          <label class="event__favorite-btn" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
             </svg>
-          </label>
+          </label>`}
 
-          <button class="event__rollup-btn ${isNewForm ? `visually-hidden` : ``}" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${isNewForm ? `` : `<button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
+                                <span class="visually-hidden">Open event</span>
+                              </button>`}
         </header>
 
         <section class="event__details">
-          <section class="event__section event__section--offers ${tripItem.offers.length ? `` : `visually-hidden`}">
+          <section class="event__section event__section--offers ${OffersModel.getOfferForType(tripItem.type).length ? `` : `visually-hidden`}">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-              ${getOffers(tripItem)}
+              ${getOffers(tripItem, isDisabled)}
             </div>
           </section>
           <section class="event__section event__section--destination ${DestinationsModel.getDestinationsForCity(tripItem.city) ? `` : `visually-hidden`}">
@@ -141,8 +143,8 @@ export default class TripEditItem extends Smart {
     this._datepickerBegin = null;
     this._datepickerEnd = null;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._timeBeginChangeHandler = this._timeBeginChangeHandler.bind(this);
     this._timeEndChangeHandler = this._timeEndChangeHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
@@ -157,10 +159,14 @@ export default class TripEditItem extends Smart {
     this._setDatepicker();
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+    if (this.getElement().querySelector(`.event__rollup-btn`)) {
+      this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+    }
     Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+    if (this.getElement().querySelector(`.event__favorite-btn`)) {
+      this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+    }
     this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._costChangeHandler);
     Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`)).forEach((eventOffer) => eventOffer.addEventListener(`click`, this._offersChangeHandler));
   }
@@ -178,9 +184,34 @@ export default class TripEditItem extends Smart {
     }
   }
 
+  getTemplate() {
+    return createTripEditItemTemplate(this._data);
+  }
+
+  formEditSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+  }
+
+  deleteEditFormClickHandler(callback) {
+    this._callback.deleteClick = callback;
+  }
+
+  closeEditFormClickHandler(callback) {
+    this._callback.editClick = callback;
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.formSubmit(Object.assign({}, this._data));
+  }
+
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(this._data);
   }
 
   _closeClickHandler(evt) {
@@ -188,9 +219,10 @@ export default class TripEditItem extends Smart {
     this._callback.editClick();
   }
 
-  _deleteClickHandler(evt) {
+  _favoriteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(this._data);
+    this.updateData({isFavorite: !this._data.isFavorite});
+    this._callback.favoriteClick();
   }
 
   _timeBeginChangeHandler(selectedDates) {
@@ -231,7 +263,7 @@ export default class TripEditItem extends Smart {
   _typeClickHandler(evt) {
     evt.preventDefault();
     const type = evt.target.value;
-    this.updateData({type});
+    this.updateData({type, offers: []});
   }
 
   _offersChangeHandler(evt) {
@@ -255,35 +287,9 @@ export default class TripEditItem extends Smart {
     this.updateData({city, destination: {desc, photo}});
   }
 
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this.updateData({isFavorite: !this._data.isFavorite});
-    this._callback.favoriteClick();
-  }
-
   _costChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({cost: evt.target.value});
-  }
-
-  getTemplate() {
-    return createTripEditItemTemplate(this._data);
-  }
-
-  closeEditFormClickHandler(callback) {
-    this._callback.editClick = callback;
-  }
-
-  deleteEditFormClickHandler(callback) {
-    this._callback.deleteClick = callback;
-  }
-
-  formEditSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-  }
-
-  setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
   }
 }
 

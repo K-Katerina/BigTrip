@@ -71,7 +71,10 @@ export default class Trips extends Observer {
           destination: {
             desc: trip.destination.description,
             photo: [...trip.destination.pictures]
-          }
+          },
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
         }
     );
 
@@ -112,6 +115,9 @@ export default class Trips extends Observer {
     delete adaptedTrip.timeBegin;
     delete adaptedTrip.timeEnd;
     delete adaptedTrip.isFavorite;
+    delete adaptedTrip.isDisabled;
+    delete adaptedTrip.isSaving;
+    delete adaptedTrip.isDeleting;
 
     return adaptedTrip;
   }

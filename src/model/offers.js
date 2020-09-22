@@ -4,10 +4,6 @@ export default class Offers {
     this._offers = offers.slice();
   }
 
-  static getAllOffers() {
-    return this._offers;
-  }
-
   static getOfferForType(offerType) {
     const index = this._offers.findIndex((offer) => offer.type === offerType);
 
