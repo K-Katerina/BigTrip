@@ -37,13 +37,8 @@ export default class Filter extends Smart {
     return createFilterTemplate(this._currentFilter);
   }
 
-  _filterTypeChangeHandler(evt) {
-    if (evt.target.tagName !== `LABEL`) {
-      return;
-    }
-    evt.preventDefault();
-    this._currentFilter = evt.target.dataset.filterType;
-    this._callback.filterTypeChange(this._currentFilter);
+  updateData(updated) {
+    this._currentFilter = updated;
     this.updateElement();
   }
 
@@ -51,8 +46,13 @@ export default class Filter extends Smart {
     this._callback.filterTypeChange = callback;
   }
 
-  updateData(updated) {
-    this._currentFilter = updated;
+  _filterTypeChangeHandler(evt) {
+    if (evt.target.tagName !== `LABEL`) {
+      return;
+    }
+    evt.preventDefault();
+    this._currentFilter = evt.target.dataset.filterType;
+    this._callback.filterTypeChange(this._currentFilter);
     this.updateElement();
   }
 }

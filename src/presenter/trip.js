@@ -7,7 +7,7 @@ import TripEventsList from "../view/trip-events-list";
 import TripDayList from "../view/trip-day-list";
 import NoItems from "../view/no-items";
 import Sort from "../view/sort";
-import TripItem from "./trip-item";
+import TripItem, {State} from "./trip-item";
 import NewItemTrip from "./new-item-trip";
 import LoadingView from "../view/loading";
 
@@ -63,6 +63,11 @@ export default class Trip {
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
+  createNewTrip() {
+    this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
+    this._newTripItem.init();
+  }
+
   _clearSort() {
     this._currentSortType = SORT_DEFAULT;
     remove(this._sortComponent);
@@ -78,24 +83,16 @@ export default class Trip {
     this._tripDayListComponent.getElement().innerHTML = ``;
   }
 
-  createNewTrip() {
-    this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
-    this._newTripItem.init();
-  }
-
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
         this._eventPresenter[data.id].init(data);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда что-то было удалено/добавлено)
         this._clearTrips();
         this.init();
         break;
       case UpdateType.MAJOR:
-        // - обновить весь маршрут (например, при переключении фильтра)
         this._currentSortType = SORT_DEFAULT;
         this._clearTrips();
         this.init();
@@ -116,15 +113,28 @@ export default class Trip {
   _eventChangeHandler(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.ADD:
-        this._tripsModel.addTripItem(updateType, update);
+        this._newTripItem.setSaving();
+        this._api.addTrip(update).then((response) => {
+          this._tripsModel.addTripItem(updateType, response);
+        }).catch(() => {
+          this._newTripItem.setAborting();
+        });
         break;
       case UserAction.UPDATE:
+        this._eventPresenter[update.id].setViewState(State.SAVING);
         this._api.updateTrip(update).then((response) => {
           this._tripsModel.updateTripItem(updateType, response);
+        }).catch(() => {
+          this._eventPresenter[update.id].setViewState(State.ABORTING);
         });
         break;
       case UserAction.DELETE:
-        this._tripsModel.deleteTripItem(updateType, update);
+        this._eventPresenter[update.id].setViewState(State.DELETING);
+        this._api.deleteTrip(update).then(() => {
+          this._tripsModel.deleteTripItem(updateType, update);
+        }).catch(() => {
+          this._eventPresenter[update.id].setViewState(State.ABORTING);
+        });
         break;
     }
   }
@@ -159,7 +169,7 @@ export default class Trip {
   }
 
   _renderEventList(trips = this._getSortedAndFilteredTrips(this._tripsModel.getTrips()), isDefaultSorting = this._currentSortType === SORT_DEFAULT) {
-    this._tripDayListComponent.getElement().innerHTML = ``;
+    this._clearTrips();
     if (isDefaultSorting) {
       Array.from(trips.keys())
         .sort()

@@ -8,6 +8,12 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 export default class TripItem {
   constructor(container, changeData, changeMode) {
     this._container = container;
@@ -59,15 +65,43 @@ export default class TripItem {
     remove(prevEditItemView);
   }
 
+  destroy() {
+    remove(this._tripItemView);
+    remove(this._tripEditItemView);
+  }
+
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceTripEditItemToTripItem();
     }
   }
 
-  destroy() {
-    remove(this._tripItemView);
-    remove(this._tripEditItemView);
+  setViewState(state) {
+    const resetFormState = () => {
+      this._tripEditItemView.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+    switch (state) {
+      case State.SAVING:
+        this._tripEditItemView.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._tripEditItemView.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+      case State.ABORTING:
+        this._tripItemView.shake(resetFormState);
+        this._tripEditItemView.shake(resetFormState);
+        break;
+    }
   }
 
   _handleOpenClick() {
@@ -96,7 +130,6 @@ export default class TripItem {
         isOldTime && isOldCost ? UpdateType.PATCH : UpdateType.MINOR,
         Object.assign({}, this._tripItem, tripItem)
     );
-    this._replaceTripEditItemToTripItem();
   }
 
   _handleFavoriteClick() {
