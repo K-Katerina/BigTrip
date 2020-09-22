@@ -1,6 +1,5 @@
 import {remove, render, RenderPosition} from "../utils/render";
 import TripEditItem from "../view/trip-edit-item";
-import {getId} from "../utils/common";
 import {UpdateType, UserAction} from "../const";
 
 export default class NewItemTrip {
@@ -43,7 +42,8 @@ export default class NewItemTrip {
     this._addData(
         UserAction.ADD,
         UpdateType.MAJOR,
-        Object.assign({}, trip, {id: getId()})
+        trip
+        // Object.assign({}, trip, {id: getId()})
     );
     this.destroy();
   }

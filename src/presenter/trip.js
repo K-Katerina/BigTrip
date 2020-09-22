@@ -116,7 +116,9 @@ export default class Trip {
   _eventChangeHandler(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.ADD:
-        this._tripsModel.addTripItem(updateType, update);
+        this._api.addTrip(update).then((response) => {
+          this._tripsModel.addTripItem(updateType, response);
+        });
         break;
       case UserAction.UPDATE:
         this._api.updateTrip(update).then((response) => {
@@ -124,7 +126,9 @@ export default class Trip {
         });
         break;
       case UserAction.DELETE:
-        this._tripsModel.deleteTripItem(updateType, update);
+        this._api.deleteTrip(update).then(() => {
+          this._tripsModel.deleteTripItem(updateType, update);
+        });
         break;
     }
   }
@@ -159,7 +163,7 @@ export default class Trip {
   }
 
   _renderEventList(trips = this._getSortedAndFilteredTrips(this._tripsModel.getTrips()), isDefaultSorting = this._currentSortType === SORT_DEFAULT) {
-    this._tripDayListComponent.getElement().innerHTML = ``;
+    this._clearTrips();
     if (isDefaultSorting) {
       Array.from(trips.keys())
         .sort()

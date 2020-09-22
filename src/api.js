@@ -4,7 +4,9 @@ import OffersModel from "./model/offers";
 
 const Method = {
   GET: `GET`,
-  PUT: `PUT`
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
 };
 
 const SuccessHTTPStatusRange = {
@@ -53,6 +55,24 @@ export default class Api {
     })
       .then(Api.toJSON)
       .then(TripsModel.adaptToClient);
+  }
+
+  addTrip(trip) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(TripsModel.adaptToServer(trip)),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api.toJSON)
+      .then(TripsModel.adaptToClient);
+  }
+
+  deleteTrip(trip) {
+    return this._load({
+      url: `points/${trip.id}`,
+      method: Method.DELETE
+    });
   }
 
   _load({

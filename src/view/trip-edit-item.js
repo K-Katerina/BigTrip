@@ -98,21 +98,21 @@ const createTripEditItemTemplate = (tripItem) => {
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? `disabled` : ``}>Save</button>
           <button class="event__reset-btn" type="reset">${isNewForm ? `Close` : `Delete`}</button>
 
-          <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``}>
-          <label class="event__favorite-btn ${isNewForm ? `visually-hidden` : ``}" for="event-favorite-1">
+          ${isNewForm ? `` : `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``}>
+          <label class="event__favorite-btn" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
             </svg>
-          </label>
+          </label>`}
 
-          <button class="event__rollup-btn ${isNewForm ? `visually-hidden` : ``}" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${isNewForm ? `` : `<button class="event__rollup-btn" type="button">
+                                <span class="visually-hidden">Open event</span>
+                              </button>`}
         </header>
 
         <section class="event__details">
-          <section class="event__section event__section--offers ${tripItem.offers.length ? `` : `visually-hidden`}">
+          <section class="event__section event__section--offers ${OffersModel.getOfferForType(tripItem.type).length ? `` : `visually-hidden`}">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
@@ -157,10 +157,14 @@ export default class TripEditItem extends Smart {
     this._setDatepicker();
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._deleteClickHandler);
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+    if (this.getElement().querySelector(`.event__rollup-btn`)) {
+      this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+    }
     Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
-    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+    if (this.getElement().querySelector(`.event__favorite-btn`)) {
+      this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+    }
     this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._costChangeHandler);
     Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`)).forEach((eventOffer) => eventOffer.addEventListener(`click`, this._offersChangeHandler));
   }
@@ -231,7 +235,7 @@ export default class TripEditItem extends Smart {
   _typeClickHandler(evt) {
     evt.preventDefault();
     const type = evt.target.value;
-    this.updateData({type});
+    this.updateData({type, offers: []});
   }
 
   _offersChangeHandler(evt) {
