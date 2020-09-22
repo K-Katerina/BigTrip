@@ -65,15 +65,15 @@ export default class TripItem {
     remove(prevEditItemView);
   }
 
+  destroy() {
+    remove(this._tripItemView);
+    remove(this._tripEditItemView);
+  }
+
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceTripEditItemToTripItem();
     }
-  }
-
-  destroy() {
-    remove(this._tripItemView);
-    remove(this._tripEditItemView);
   }
 
   setViewState(state) {

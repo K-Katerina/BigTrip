@@ -61,11 +61,6 @@ export default class TripItem extends Smart {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._openEditFormClickHandler);
   }
 
-  _openEditFormClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.openEditFormClick();
-  }
-
   getTemplate() {
     return createTripItemTemplate(this._tripItem);
   }
@@ -73,5 +68,10 @@ export default class TripItem extends Smart {
   openEditFormClickHandler(callback) {
     this._callback.openEditFormClick = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._openEditFormClickHandler);
+  }
+
+  _openEditFormClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.openEditFormClick();
   }
 }

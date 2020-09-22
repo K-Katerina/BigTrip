@@ -63,6 +63,11 @@ export default class Trip {
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
+  createNewTrip() {
+    this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
+    this._newTripItem.init();
+  }
+
   _clearSort() {
     this._currentSortType = SORT_DEFAULT;
     remove(this._sortComponent);
@@ -76,11 +81,6 @@ export default class Trip {
       .forEach((event) => event.destroy());
     this._eventPresenter = {};
     this._tripDayListComponent.getElement().innerHTML = ``;
-  }
-
-  createNewTrip() {
-    this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
-    this._newTripItem.init();
   }
 
   _handleModelEvent(updateType, data) {

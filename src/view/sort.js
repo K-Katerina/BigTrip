@@ -42,6 +42,10 @@ export default class Sort extends Smart {
     return createSortTemplate(this._currentSortType);
   }
 
+  setSortTypeChangeHandler(callback) {
+    this._callback.sortTypeChange = callback;
+  }
+
   _sortTypeChangeHandler(evt) {
     if (evt.target.tagName !== `LABEL`) {
       return;
@@ -50,9 +54,5 @@ export default class Sort extends Smart {
     this._currentSortType = evt.target.dataset.sortType;
     this._callback.sortTypeChange(this._currentSortType);
     this.updateElement();
-  }
-
-  setSortTypeChangeHandler(callback) {
-    this._callback.sortTypeChange = callback;
   }
 }

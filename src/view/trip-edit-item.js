@@ -1,11 +1,11 @@
 import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, getInOrTo, getBlackTrip} from "../const";
 import flatpickr from "flatpickr";
+import he from "he";
+import {parseTime, parseDate, capitalizeWord} from "../utils/common";
 import {Smart} from "./smart";
 import OffersModel from "../model/offers";
-import {parseTime, parseDate, capitalizeWord} from "../utils/common";
-import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import DestinationsModel from "../model/destination";
-import he from "he";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 
 const fillTypeGroup = (types) => {
@@ -143,8 +143,8 @@ export default class TripEditItem extends Smart {
     this._datepickerBegin = null;
     this._datepickerEnd = null;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._timeBeginChangeHandler = this._timeBeginChangeHandler.bind(this);
     this._timeEndChangeHandler = this._timeEndChangeHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
@@ -184,9 +184,34 @@ export default class TripEditItem extends Smart {
     }
   }
 
+  getTemplate() {
+    return createTripEditItemTemplate(this._data);
+  }
+
+  formEditSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+  }
+
+  deleteEditFormClickHandler(callback) {
+    this._callback.deleteClick = callback;
+  }
+
+  closeEditFormClickHandler(callback) {
+    this._callback.editClick = callback;
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.formSubmit(Object.assign({}, this._data));
+  }
+
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(this._data);
   }
 
   _closeClickHandler(evt) {
@@ -194,9 +219,10 @@ export default class TripEditItem extends Smart {
     this._callback.editClick();
   }
 
-  _deleteClickHandler(evt) {
+  _favoriteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(this._data);
+    this.updateData({isFavorite: !this._data.isFavorite});
+    this._callback.favoriteClick();
   }
 
   _timeBeginChangeHandler(selectedDates) {
@@ -261,35 +287,9 @@ export default class TripEditItem extends Smart {
     this.updateData({city, destination: {desc, photo}});
   }
 
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this.updateData({isFavorite: !this._data.isFavorite});
-    this._callback.favoriteClick();
-  }
-
   _costChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({cost: evt.target.value});
-  }
-
-  getTemplate() {
-    return createTripEditItemTemplate(this._data);
-  }
-
-  closeEditFormClickHandler(callback) {
-    this._callback.editClick = callback;
-  }
-
-  deleteEditFormClickHandler(callback) {
-    this._callback.deleteClick = callback;
-  }
-
-  formEditSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-  }
-
-  setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
   }
 }
 
