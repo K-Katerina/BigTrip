@@ -25,9 +25,10 @@ export const UpdateType = {
 };
 
 export const UserAction = {
-  ADD: `ADD`,
+  CREATE: `CREATE`,
   UPDATE: `UPDATE`,
-  DELETE: `DELETE`
+  DELETE: `DELETE`,
+  SET_FAVORITE: `SET FAVORITE`
 };
 
 export const MenuItem = {
@@ -63,3 +64,32 @@ export const FILTER_DEFAULT = FILTER.EVERYTHING;
 export const MONTH_NAMES = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `June`, `July`, `Aug`, `Sept`, `Oct`, `Nov`, `Dec`];
 
 export const getInOrTo = (type) => TYPE_TRIP_ITEM_IN.indexOf(type) > 0 ? `in` : `to`;
+
+export const getEmojiForTripItemType = (type) => {
+  switch (type) {
+    case `taxi`:
+      return `🚖`;
+    case `bus`:
+      return `🚌`;
+    case `train`:
+      return `🚋`;
+    case `ship`:
+      return `🚢`;
+    case `transport`:
+      return `🚜`;
+    case `drive`:
+      return `🚘`;
+    case `flight`:
+      return `✈️`;
+    case `check-in`:
+      return `🏨`;
+    case `sightseeing`:
+      return `🏛`;
+    case `restaurant`:
+      return `🍴`;
+    default:
+      throw new Error(`Unknowm type: ${type}`);
+  }
+
+  return emoji;
+};

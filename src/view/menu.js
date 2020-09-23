@@ -23,6 +23,7 @@ export default class Menu extends AbstractView {
   }
 
   setMenuItem(menuItem) {
+    this._removeClassActive();
     const item = this.getElement().querySelector(`[data-menu-item="${menuItem}"]`);
     if (item !== null) {
       item.classList.add(`trip-tabs__btn--active`);
@@ -38,11 +39,15 @@ export default class Menu extends AbstractView {
     evt.preventDefault();
 
     if (evt.target.tagName === `A` && !evt.target.classList.contains(`trip-tabs__btn--active`)) {
-      this.getElement().querySelectorAll(`a`).forEach((item) => {
-        item.classList.remove(`trip-tabs__btn--active`);
-      });
+      this._removeClassActive();
       evt.target.classList.add(`trip-tabs__btn--active`);
       this._callback.menuClick(evt.target.dataset.menuItem);
     }
+  }
+
+  _removeClassActive() {
+    this.getElement().querySelectorAll(`a`).forEach((item) => {
+      item.classList.remove(`trip-tabs__btn--active`);
+    });
   }
 }

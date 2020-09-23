@@ -18,7 +18,7 @@ const fillTypeGroup = (types) => {
 };
 
 const getOffers = (tripItem, isDisabled) => {
-  return OffersModel.getOfferForType(tripItem.type).map((offer, index) =>
+  return OffersModel.getOffersForType(tripItem.type).map((offer, index) =>
     `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${tripItem.type}-${tripItem.id}-${index}" type="checkbox" name="event-offer-${tripItem.type}" ${tripItem.offers.find((item) => offer.title === item.title) ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
       <label class="event__offer-label" for="event-offer-${tripItem.type}-${tripItem.id}-${index}">
@@ -48,11 +48,11 @@ const createTripEditItemTemplate = (tripItem) => {
       <form class="trip-events__item event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
-            <label class="event__type  event__type-btn" for="event-type-toggle-1">
+            <label class="event__type  event__type-btn" for="event-type-toggle-${tripItem.id}">
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${tripItem.type.toLowerCase()}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${tripItem.id}" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -68,40 +68,40 @@ const createTripEditItemTemplate = (tripItem) => {
           </div>
 
           <div class="event__field-group  event__field-group--destination">
-            <label class="event__label  event__type-output" for="event-destination-1">
+            <label class="event__label  event__type-output" for="event-destination-${tripItem.id}">
               ${capitalizeWord(tripItem.type)} ${getInOrTo(tripItem.type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(tripItem.city)}" list="destination-list-1" ${isDisabled ? `disabled` : ``}>
-            <datalist id="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-${tripItem.id}" type="text" name="event-destination" value="${he.encode(tripItem.city)}" list="destination-list-${tripItem.id}" ${isDisabled ? `disabled` : ``}>
+            <datalist id="destination-list-${tripItem.id}">
               ${getCity().map((city) => `<option value="${city}"></option>\n`).join(``)}
             </datalist>
           </div>
 
           <div class="event__field-group  event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-1">
+            <label class="visually-hidden" for="event-start-time-${tripItem.id}">
               From
             </label>
             <input class="event__input  event__input--time" id="event-start-time" type="text" required name="event-start-time" value="${parseDate(tripItem.timeBegin)} ${parseTime(tripItem.timeBegin)}" ${isDisabled ? `disabled` : ``}>
             &mdash;
-            <label class="visually-hidden" for="event-end-time-1">
+            <label class="visually-hidden" for="event-end-time-${tripItem.id}">
               To
             </label>
             <input class="event__input  event__input--time" id="event-end-time" type="text" required name="event-end-time" value="${parseDate(tripItem.timeEnd)} ${parseTime(tripItem.timeEnd)}" ${isDisabled ? `disabled` : ``}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
-            <label class="event__label" for="event-price-1">
+            <label class="event__label" for="event-price-${tripItem.id}">
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${tripItem.cost}" ${isDisabled ? `disabled` : ``}>
+            <input class="event__input  event__input--price" id="event-price-${tripItem.id}" type="number" name="event-price" value="${tripItem.cost}" ${isDisabled ? `disabled` : ``}>
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? `disabled` : ``}>${tripItem.isSaving ? `Saving...` : `Save`}</button>
           <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isNewForm ? `Close` : deleteText}</button>
 
-          ${isNewForm ? `` : `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
-          <label class="event__favorite-btn" for="event-favorite-1">
+          ${isNewForm ? `` : `<input id="event-favorite-${tripItem.id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${tripItem.isFavorite ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
+          <label class="event__favorite-btn" for="event-favorite-${tripItem.id}">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -114,7 +114,7 @@ const createTripEditItemTemplate = (tripItem) => {
         </header>
 
         <section class="event__details">
-          <section class="event__section event__section--offers ${OffersModel.getOfferForType(tripItem.type).length ? `` : `visually-hidden`}">
+          <section class="event__section event__section--offers ${OffersModel.getOffersForType(tripItem.type).length ? `` : `visually-hidden`}">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
@@ -148,7 +148,7 @@ export default class TripEditItem extends Smart {
     this._timeBeginChangeHandler = this._timeBeginChangeHandler.bind(this);
     this._timeEndChangeHandler = this._timeEndChangeHandler.bind(this);
     this._typeClickHandler = this._typeClickHandler.bind(this);
-    this._cityClickHandler = this._cityClickHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._costChangeHandler = this._costChangeHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
@@ -163,7 +163,7 @@ export default class TripEditItem extends Smart {
       this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
     }
     Array.from(this.getElement().querySelectorAll(`.event__type-input`)).forEach((eventTypeItem) => eventTypeItem.addEventListener(`click`, this._typeClickHandler));
-    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityClickHandler);
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityChangeHandler);
     if (this.getElement().querySelector(`.event__favorite-btn`)) {
       this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
     }
@@ -221,8 +221,8 @@ export default class TripEditItem extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+    this._callback.favoriteClick(!this._data.isFavorite);
     this.updateData({isFavorite: !this._data.isFavorite});
-    this._callback.favoriteClick();
   }
 
   _timeBeginChangeHandler(selectedDates) {
@@ -268,7 +268,7 @@ export default class TripEditItem extends Smart {
 
   _offersChangeHandler(evt) {
     evt.preventDefault();
-    const offerChanged = OffersModel.getOfferForType(this._data.type).find((offer) =>
+    const offerChanged = OffersModel.getOffersForType(this._data.type).find((offer) =>
       offer.title === this.getElement().querySelector(`label[for="${evt.target.id}"] .event__offer-title`).textContent);
     let updatedOffers = [];
     if (evt.target.checked) {
@@ -279,17 +279,17 @@ export default class TripEditItem extends Smart {
     this.updateData({offers: updatedOffers});
   }
 
-  _cityClickHandler(evt) {
+  _cityChangeHandler(evt) {
     evt.preventDefault();
     const city = evt.target.value;
-    const desc = DestinationsModel.getDestinationsForCity(city).destination;
+    const destination = DestinationsModel.getDestinationsForCity(city).destination;
     const photo = DestinationsModel.getDestinationsForCity(city).photo;
-    this.updateData({city, destination: {desc, photo}});
+    this.updateData({city, destination: {destination, photo}});
   }
 
   _costChangeHandler(evt) {
     evt.preventDefault();
-    this.updateData({cost: evt.target.value});
+    this.updateData({cost: evt.target.value}, true);
   }
 }
 

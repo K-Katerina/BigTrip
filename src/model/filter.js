@@ -8,8 +8,10 @@ export default class Filter extends Observer {
   }
 
   setFilter(updateType, filter) {
-    this._currentFilter = filter;
-    this._notify(updateType, filter);
+    if (this._currentFilter !== filter) {
+      this._currentFilter = filter;
+      this._notify(updateType, filter);
+    }
   }
 
   getFilter() {

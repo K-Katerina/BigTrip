@@ -28,9 +28,8 @@ export default class Destination {
 
   static getDestinationsForCity(city) {
     const index = this._destinations.findIndex((item) => item.city === city);
-
     if (index === -1) {
-      throw new Error(`Not found: "${city}"!`);
+      throw new Error(`Destinations not found for city: "${city}"!`);
     }
     return this._destinations[index].destination;
   }
