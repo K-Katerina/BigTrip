@@ -59,7 +59,7 @@ export default class NewItemTrip {
 
   _handleFormSubmit(trip) {
     this._addData(
-        UserAction.ADD,
+        UserAction.CREATE,
         UpdateType.MAJOR,
         trip
     );

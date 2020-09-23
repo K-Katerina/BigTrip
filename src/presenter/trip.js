@@ -36,13 +36,18 @@ export default class Trip {
   init() {
     this._tripsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this.refresh();
+  }
+
+  refresh() {
     if (this._isLoading) {
-      render(this._container, this._loadingComponent, RenderPosition.AFTERBEGIN);
+      render(this._container, this._loadingComponent, RenderPosition.BEFOREEND);
       return;
     }
     if (!this._tripsModel.getTrips().length) {
       this._currentSortType = SORT_DEFAULT;
-      this._filterModel.setFilter(UpdateType.PATCH, FILTER_DEFAULT);
+      this._clearSort();
+      this._filterModel.setFilter(UpdateType.MAJOR, FILTER_DEFAULT);
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -69,9 +74,11 @@ export default class Trip {
   }
 
   _clearSort() {
-    this._currentSortType = SORT_DEFAULT;
-    remove(this._sortComponent);
-    this._sortComponent = null;
+    if (this._sortComponent) {
+      this._currentSortType = SORT_DEFAULT;
+      remove(this._sortComponent);
+      this._sortComponent = null;
+    }
   }
 
   _clearTrips() {
@@ -90,17 +97,17 @@ export default class Trip {
         break;
       case UpdateType.MINOR:
         this._clearTrips();
-        this.init();
+        this.refresh();
         break;
       case UpdateType.MAJOR:
         this._currentSortType = SORT_DEFAULT;
         this._clearTrips();
-        this.init();
+        this.refresh();
         break;
       case UpdateType.INIT:
         this._isLoading = false;
         remove(this._loadingComponent);
-        this.init();
+        this.refresh();
         break;
     }
   }
@@ -112,7 +119,7 @@ export default class Trip {
 
   _eventChangeHandler(actionType, updateType, update) {
     switch (actionType) {
-      case UserAction.ADD:
+      case UserAction.CREATE:
         this._newTripItem.setSaving();
         this._api.addTrip(update).then((response) => {
           this._tripsModel.addTripItem(updateType, response);
@@ -122,6 +129,13 @@ export default class Trip {
         break;
       case UserAction.UPDATE:
         this._eventPresenter[update.id].setViewState(State.SAVING);
+        this._api.updateTrip(update).then((response) => {
+          this._tripsModel.updateTripItem(updateType, response);
+        }).catch(() => {
+          this._eventPresenter[update.id].setViewState(State.ABORTING);
+        });
+        break;
+      case UserAction.SET_FAVORITE:
         this._api.updateTrip(update).then((response) => {
           this._tripsModel.updateTripItem(updateType, response);
         }).catch(() => {

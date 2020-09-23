@@ -4,11 +4,10 @@ export default class Offers {
     this._offers = offers.slice();
   }
 
-  static getOfferForType(offerType) {
+  static getOffersForType(offerType) {
     const index = this._offers.findIndex((offer) => offer.type === offerType);
-
     if (index === -1) {
-      throw new Error(`Not found: "${offerType}"!`);
+      throw new Error(`Offers not found for type: "${offerType}"!`);
     }
     return this._offers[index].offers;
   }

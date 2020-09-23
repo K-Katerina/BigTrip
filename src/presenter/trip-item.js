@@ -132,11 +132,12 @@ export default class TripItem {
     );
   }
 
-  _handleFavoriteClick() {
+  _handleFavoriteClick(isNewFavorite) {
+    this._tripItem.isFavorite = isNewFavorite;
     this._changeData(
-        UserAction.UPDATE,
+        UserAction.SET_FAVORITE,
         null,
-        Object.assign({}, this._tripItem, {isFavorite: !this._tripItem.isFavorite})
+        Object.assign({}, this._tripItem, {isFavorite: isNewFavorite})
     );
   }
 

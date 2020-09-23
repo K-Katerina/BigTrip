@@ -7,7 +7,7 @@ const createTripDayTemplate = (day, index, isDefaultSorting) => {
     <li class="trip-days__item day">
       <div class="day__info">
         <span class="day__counter">${isDefaultSorting ? index + 1 : ``}</span>
-        <time class="day__date" datetime="${date}">${isDefaultSorting ? (MONTH_NAMES[date.getMonth()] + ` ` + date.getDate()) : ``}</time>
+        <time class="day__date" datetime="${date}">${isDefaultSorting ? `${MONTH_NAMES[date.getMonth()]} ${date.getDate()}` : ``}</time>
       </div>
     </li>
   `);

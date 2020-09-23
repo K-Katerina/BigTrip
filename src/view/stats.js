@@ -1,7 +1,7 @@
 import AbstractView from "./abstract-view";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {TYPE_TRIP_ITEM_TO, typeTripItem} from "../const";
+import {getEmojiForTripItemType, TYPE_TRIP_ITEM_TO, typeTripItem} from "../const";
 import moment from "moment";
 
 const BAR_HEIGHT = 55;
@@ -38,12 +38,14 @@ const renderMoneyChart = (moneyCtx, tripsModel) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: typeTripItem.map((item) => item.toUpperCase()),
+      labels: typeTripItem.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
       datasets: [{
         data: typeTripItem.map((item) => moneyMap[item]),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        anchor: `start`,
+        barThickness: 44,
+        minBarLength: 50
       }]
     },
     options: {
@@ -76,7 +78,6 @@ const renderMoneyChart = (moneyCtx, tripsModel) => {
             display: false,
             drawBorder: false
           },
-          barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -87,7 +88,6 @@ const renderMoneyChart = (moneyCtx, tripsModel) => {
             display: false,
             drawBorder: false
           },
-          minBarLength: 50
         }],
       },
       legend: {
@@ -114,12 +114,14 @@ const renderTransportChart = (transportCtx, tripsModel) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: TYPE_TRIP_ITEM_TO.map((item) => item.toUpperCase()),
+      labels: TYPE_TRIP_ITEM_TO.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
       datasets: [{
         data: TYPE_TRIP_ITEM_TO.map((item) => transportMap[item]),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        anchor: `start`,
+        minBarLength: 50,
+        barThickness: 44,
       }]
     },
     options: {
@@ -152,7 +154,6 @@ const renderTransportChart = (transportCtx, tripsModel) => {
             display: false,
             drawBorder: false
           },
-          barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -163,7 +164,6 @@ const renderTransportChart = (transportCtx, tripsModel) => {
             display: false,
             drawBorder: false
           },
-          minBarLength: 50
         }],
       },
       legend: {
@@ -188,12 +188,14 @@ const renderTimeSpendChart = (timeSpendCtx, tripsModel) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: typeTripItem.map((item) => item.toUpperCase()),
+      labels: typeTripItem.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
       datasets: [{
         data: typeTripItem.map((item) => moment.duration(timeMap[item]).days()),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        anchor: `start`,
+        barThickness: 44,
+        minBarLength: 50
       }]
     },
     options: {
@@ -226,7 +228,6 @@ const renderTimeSpendChart = (timeSpendCtx, tripsModel) => {
             display: false,
             drawBorder: false
           },
-          barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -237,7 +238,6 @@ const renderTimeSpendChart = (timeSpendCtx, tripsModel) => {
             display: false,
             drawBorder: false
           },
-          minBarLength: 50
         }],
       },
       legend: {
