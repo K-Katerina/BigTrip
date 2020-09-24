@@ -8,9 +8,9 @@ const createTripInfoCostTemplate = (trips) => {
   `);
 };
 
-const getFullCostForTrip = (trip) => trip.cost + getTripOffersCost(trip);
+const getFullCostForTrip = (trip) => +trip.cost + getTripOffersCost(trip);
 
-const getTripOffersCost = (trip) => trip.offers.reduce((previousCostSum, currentOffer) => previousCostSum + currentOffer.price, 0);
+const getTripOffersCost = (trip) => trip.offers.reduce((previousCostSum, currentOffer) => previousCostSum + (+currentOffer.price), 0);
 
 export default class TripInfoCost extends AbstractView {
   constructor(trips) {
