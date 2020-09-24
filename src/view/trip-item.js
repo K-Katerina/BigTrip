@@ -2,7 +2,7 @@ import {parseTime, getDuration, capitalizeWord} from "../utils/common";
 import {getInOrTo} from "../const";
 import {Smart} from "./smart";
 
-let MAX_OFFERS = 3;
+const MAX_OFFERS = 3;
 
 const getOffers = (offers) => {
   return (

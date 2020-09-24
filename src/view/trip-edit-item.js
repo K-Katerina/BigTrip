@@ -238,8 +238,6 @@ export default class TripEditItem extends Smart {
         element,
         {
           enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
           dateFormat: `d/m/Y H:i`,
           defaultDate: new Date(msDefaultDate) || new Date(),
           onChange: dateChangeHandler

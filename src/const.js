@@ -90,6 +90,4 @@ export const getEmojiForTripItemType = (type) => {
     default:
       throw new Error(`Unknowm type: ${type}`);
   }
-
-  return emoji;
 };

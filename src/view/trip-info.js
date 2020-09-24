@@ -1,7 +1,7 @@
 import {MONTH_NAMES} from "../const";
 import AbstractView from "./abstract-view";
 
-let ALLOWED_NUMBER_OF_CITIES = 3;
+const ALLOWED_NUMBER_OF_CITIES = 3;
 
 const getTitle = (trips) => {
   if (trips.length) {
