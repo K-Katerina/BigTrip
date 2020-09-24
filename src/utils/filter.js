@@ -1,10 +1,10 @@
-import {FILTER} from "../const";
+import {FilterType} from "../const";
 
 export const getFilteredTrips = (trips, filterType) => {
   switch (filterType) {
-    case FILTER.FUTURE:
+    case FilterType.FUTURE:
       return [...trips].filter((trip) => trip.timeBegin > Date.now());
-    case FILTER.PAST:
+    case FilterType.PAST:
       return [...trips].filter((trip) => trip.timeEnd < Date.now());
     default:
       return trips;

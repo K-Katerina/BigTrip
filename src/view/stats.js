@@ -1,7 +1,7 @@
 import AbstractView from "./abstract-view";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getEmojiForTripItemType, TYPE_TRIP_ITEM_TO, typeTripItem} from "../const";
+import {getEmojiForTripItemType, TRIP_ITEM_TO_TYPES, tripItemTypes} from "../const";
 import moment from "moment";
 
 const BAR_HEIGHT = 55;
@@ -28,7 +28,7 @@ const createStatsTemplate = () => {
 
 const renderMoneyChart = (moneyCtx, tripsModel) => {
   const moneyMap = new Map();
-  typeTripItem.forEach((type) => {
+  tripItemTypes.forEach((type) => {
     moneyMap[type] = 0;
   });
   tripsModel.getTrips().forEach((trip) => {
@@ -38,9 +38,9 @@ const renderMoneyChart = (moneyCtx, tripsModel) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: typeTripItem.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
+      labels: tripItemTypes.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
       datasets: [{
-        data: typeTripItem.map((item) => moneyMap[item]),
+        data: tripItemTypes.map((item) => moneyMap[item]),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
@@ -102,11 +102,11 @@ const renderMoneyChart = (moneyCtx, tripsModel) => {
 
 const renderTransportChart = (transportCtx, tripsModel) => {
   const transportMap = new Map();
-  TYPE_TRIP_ITEM_TO.forEach((type) => {
+  TRIP_ITEM_TO_TYPES.forEach((type) => {
     transportMap[type] = 0;
   });
   tripsModel.getTrips().forEach((trip) => {
-    if (TYPE_TRIP_ITEM_TO.findIndex((type) => trip.type === type) !== -1) {
+    if (TRIP_ITEM_TO_TYPES.findIndex((type) => trip.type === type) !== -1) {
       transportMap[trip.type.toLowerCase()]++;
     }
   });
@@ -114,9 +114,9 @@ const renderTransportChart = (transportCtx, tripsModel) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: TYPE_TRIP_ITEM_TO.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
+      labels: TRIP_ITEM_TO_TYPES.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
       datasets: [{
-        data: TYPE_TRIP_ITEM_TO.map((item) => transportMap[item]),
+        data: TRIP_ITEM_TO_TYPES.map((item) => transportMap[item]),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
@@ -178,7 +178,7 @@ const renderTransportChart = (transportCtx, tripsModel) => {
 
 const renderTimeSpendChart = (timeSpendCtx, tripsModel) => {
   const timeMap = new Map();
-  typeTripItem.forEach((type) => {
+  tripItemTypes.forEach((type) => {
     timeMap[type] = 0;
   });
   tripsModel.getTrips().forEach((trip) => {
@@ -188,9 +188,9 @@ const renderTimeSpendChart = (timeSpendCtx, tripsModel) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: typeTripItem.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
+      labels: tripItemTypes.map((item) => `${getEmojiForTripItemType(item)} ${item.toUpperCase()}`),
       datasets: [{
-        data: typeTripItem.map((item) => moment.duration(timeMap[item]).days()),
+        data: tripItemTypes.map((item) => moment.duration(timeMap[item]).days()),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,

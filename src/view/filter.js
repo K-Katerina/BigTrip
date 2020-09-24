@@ -1,20 +1,20 @@
-import {FILTER, FILTER_DEFAULT} from "../const";
+import {FilterType, FILTER_DEFAULT} from "../const";
 import {Smart} from "./smart";
 
 const createFilterTemplate = (currentFilter) => {
   return (`
     <form class="trip-filters" action="#" method="get">
       <div class="trip-filters__filter">
-        <input id="filter-${FILTER.EVERYTHING.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${FILTER.EVERYTHING.toLowerCase()}" ${FILTER.EVERYTHING === currentFilter ? `checked` : ``}>
-        <label class="trip-filters__filter-label" data-filter-type="${FILTER.EVERYTHING}" for="filter-${FILTER.EVERYTHING.toLowerCase()}">${FILTER.EVERYTHING}</label>
+        <input id="filter-${FilterType.EVERYTHING.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${FilterType.EVERYTHING.toLowerCase()}" ${FilterType.EVERYTHING === currentFilter ? `checked` : ``}>
+        <label class="trip-filters__filter-label" data-filter-type="${FilterType.EVERYTHING}" for="filter-${FilterType.EVERYTHING.toLowerCase()}">${FilterType.EVERYTHING}</label>
       </div>
       <div class="trip-filters__filter">
-        <input id="filter-${FILTER.FUTURE.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${FILTER.FUTURE.toLowerCase()}" ${FILTER.FUTURE === currentFilter ? `checked` : ``}>
-        <label class="trip-filters__filter-label" data-filter-type="${FILTER.FUTURE}" for="filter-${FILTER.FUTURE.toLowerCase()}">${FILTER.FUTURE}</label>
+        <input id="filter-${FilterType.FUTURE.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${FilterType.FUTURE.toLowerCase()}" ${FilterType.FUTURE === currentFilter ? `checked` : ``}>
+        <label class="trip-filters__filter-label" data-filter-type="${FilterType.FUTURE}" for="filter-${FilterType.FUTURE.toLowerCase()}">${FilterType.FUTURE}</label>
       </div>
       <div class="trip-filters__filter">
-        <input id="filter-${FILTER.PAST.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${FILTER.PAST.toLowerCase()}" ${FILTER.PAST === currentFilter ? `checked` : ``}>
-        <label class="trip-filters__filter-label" data-filter-type="${FILTER.PAST}" for="filter-${FILTER.PAST.toLowerCase()}">${FILTER.PAST}</label>
+        <input id="filter-${FilterType.PAST.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${FilterType.PAST.toLowerCase()}" ${FilterType.PAST === currentFilter ? `checked` : ``}>
+        <label class="trip-filters__filter-label" data-filter-type="${FilterType.PAST}" for="filter-${FilterType.PAST.toLowerCase()}">${FilterType.PAST}</label>
       </div>
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>

@@ -1,17 +1,17 @@
 import DestinationsModel from "./model/destination";
 
-export const TYPE_TRIP_ITEM_TO = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
-export const TYPE_TRIP_ITEM_IN = [`check-in`, `sightseeing`, `restaurant`];
+export const TRIP_ITEM_TO_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
+export const TRIP_ITEM_IN_TYPES = [`check-in`, `sightseeing`, `restaurant`];
 
-export const typeTripItem = [...TYPE_TRIP_ITEM_TO, ...TYPE_TRIP_ITEM_IN];
+export const tripItemTypes = [...TRIP_ITEM_TO_TYPES, ...TRIP_ITEM_IN_TYPES];
 
-export const FILTER = {
+export const FilterType = {
   EVERYTHING: `everything`,
   FUTURE: `future`,
   PAST: `past`
 };
 
-export const SORT = {
+export const SortType = {
   EVENT: `event`,
   TIME: `time`,
   PRICE: `price`
@@ -36,7 +36,7 @@ export const MenuItem = {
   STATS: `stats`
 };
 
-const typeDefault = typeTripItem[0];
+const typeDefault = tripItemTypes[0];
 
 const DEFAULT_COST = 100;
 
@@ -57,13 +57,13 @@ export const getBlackTrip = () => {
   };
 };
 
-export const SORT_DEFAULT = SORT.EVENT;
+export const SORT_DEFAULT = SortType.EVENT;
 
-export const FILTER_DEFAULT = FILTER.EVERYTHING;
+export const FILTER_DEFAULT = FilterType.EVERYTHING;
 
 export const MONTH_NAMES = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `June`, `July`, `Aug`, `Sept`, `Oct`, `Nov`, `Dec`];
 
-export const getInOrTo = (type) => TYPE_TRIP_ITEM_IN.indexOf(type) > 0 ? `in` : `to`;
+export const getInOrTo = (type) => TRIP_ITEM_IN_TYPES.indexOf(type) > 0 ? `in` : `to`;
 
 export const getEmojiForTripItemType = (type) => {
   switch (type) {
