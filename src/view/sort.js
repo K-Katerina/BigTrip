@@ -1,24 +1,24 @@
-import {SORT, SORT_DEFAULT} from "../const";
+import {SortType, SORT_DEFAULT} from "../const";
 import {Smart} from "./smart";
 
-const createSortTemplate = (currentSortType = SORT.EVENT) => {
+const createSortTemplate = (currentSortType = SortType.EVENT) => {
   return (`
     <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      <span class="trip-sort__item trip-sort__item--day"> ${currentSortType === SORT.EVENT ? `day` : ``}</span>
+      <span class="trip-sort__item trip-sort__item--day"> ${currentSortType === SortType.EVENT ? `day` : ``}</span>
 
-      <div class="trip-sort__item trip-sort__item--${SORT.EVENT}">
-        <input id="sort-${SORT.EVENT}" class="trip-sort__input visually-hidden" type="radio" name="trip-sort" value="sort-${SORT.EVENT}" ${currentSortType === SORT.EVENT ? `checked` : ``}>
-        <label class="trip-sort__btn" for="sort-${SORT.EVENT}" data-sort-type="${SORT.EVENT}" >${SORT.EVENT}</label>
+      <div class="trip-sort__item trip-sort__item--${SortType.EVENT}">
+        <input id="sort-${SortType.EVENT}" class="trip-sort__input visually-hidden" type="radio" name="trip-sort" value="sort-${SortType.EVENT}" ${currentSortType === SortType.EVENT ? `checked` : ``}>
+        <label class="trip-sort__btn" for="sort-${SortType.EVENT}" data-sort-type="${SortType.EVENT}" >${SortType.EVENT}</label>
       </div>
 
-      <div class="trip-sort__item trip-sort__item--${SORT.TIME}">
-        <input id="sort-${SORT.TIME}" class="trip-sort__input visually-hidden" type="radio" name="trip-sort" value="sort-${SORT.TIME}" ${currentSortType === SORT.TIME ? `checked` : ``}>
-        <label class="trip-sort__btn" for="sort-${SORT.TIME}" data-sort-type="${SORT.TIME}">${SORT.TIME}</label>
+      <div class="trip-sort__item trip-sort__item--${SortType.TIME}">
+        <input id="sort-${SortType.TIME}" class="trip-sort__input visually-hidden" type="radio" name="trip-sort" value="sort-${SortType.TIME}" ${currentSortType === SortType.TIME ? `checked` : ``}>
+        <label class="trip-sort__btn" for="sort-${SortType.TIME}" data-sort-type="${SortType.TIME}">${SortType.TIME}</label>
       </div>
 
-      <div class="trip-sort__item trip-sort__item--${SORT.PRICE}">
-        <input id="sort-${SORT.PRICE}" class="trip-sort__input visually-hidden" type="radio" name="trip-sort" value="sort-${SORT.PRICE}" ${currentSortType === SORT.PRICE ? `checked` : ``}>
-        <label class="trip-sort__btn" for="sort-${SORT.PRICE}" data-sort-type="${SORT.PRICE}">${SORT.PRICE}</label>
+      <div class="trip-sort__item trip-sort__item--${SortType.PRICE}">
+        <input id="sort-${SortType.PRICE}" class="trip-sort__input visually-hidden" type="radio" name="trip-sort" value="sort-${SortType.PRICE}" ${currentSortType === SortType.PRICE ? `checked` : ``}>
+        <label class="trip-sort__btn" for="sort-${SortType.PRICE}" data-sort-type="${SortType.PRICE}">${SortType.PRICE}</label>
       </div>
 
       <span class="trip-sort__item  trip-sort__item--offers">offers</span>

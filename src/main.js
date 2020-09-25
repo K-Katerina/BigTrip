@@ -7,14 +7,21 @@ import FilterPresenter from "./presenter/filter";
 import InfoPresenter from "./presenter/info";
 import Menu from "./view/menu";
 import Stats from "./view/stats";
-import Api from "./api";
+import Api from "./api/index";
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
 
-const AUTHORIZATION = `Basic ebkjehjklcbn`;
+const AUTHORIZATION = `Basic 1234d4r45`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
+const STORE_PREFIX = `bigtrip-localstorage`;
+const STORE_VER = `v12`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const tripsModel = new TripsModel();
 const filterModel = new FilterModel();
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const body = document.querySelector(`.page-body`);
 const tripMainView = body.querySelector(`.trip-main`);
@@ -25,7 +32,7 @@ render(tripMainView.querySelector(`.trip-controls`), menuComponent, RenderPositi
 
 menuComponent.setMenuItem(currentMenu);
 
-api.getAllData()
+apiWithProvider.getAllData()
   .then((trips) => {
     tripsModel.setTrips(UpdateType.INIT, trips);
   })
@@ -34,7 +41,7 @@ api.getAllData()
   });
 
 const infoPresenter = new InfoPresenter(tripMainView, tripsModel);
-const tripPresenter = new TripPresenter(body.querySelector(`.trip-events`), tripsModel, filterModel, api);
+const tripPresenter = new TripPresenter(body.querySelector(`.trip-events`), tripsModel, filterModel, apiWithProvider);
 const filterPresenter = new FilterPresenter(tripControlsView, filterModel, tripsModel);
 
 
@@ -68,4 +75,17 @@ body.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) 
     tripPresenter.init();
   }
   tripPresenter.createNewTrip();
+});
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });

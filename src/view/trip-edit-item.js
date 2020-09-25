@@ -1,4 +1,4 @@
-import {TYPE_TRIP_ITEM_IN, TYPE_TRIP_ITEM_TO, getInOrTo, getBlackTrip} from "../const";
+import {TRIP_ITEM_IN_TYPES, TRIP_ITEM_TO_TYPES, getInOrTo, getBlackTrip} from "../const";
 import flatpickr from "flatpickr";
 import he from "he";
 import {parseTime, parseDate, capitalizeWord} from "../utils/common";
@@ -57,12 +57,12 @@ const createTripEditItemTemplate = (tripItem) => {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Transfer</legend>
-                ${fillTypeGroup(TYPE_TRIP_ITEM_TO)}
+                ${fillTypeGroup(TRIP_ITEM_TO_TYPES)}
               </fieldset>
 
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Activity</legend>
-                    ${fillTypeGroup(TYPE_TRIP_ITEM_IN)}
+                    ${fillTypeGroup(TRIP_ITEM_IN_TYPES)}
               </fieldset>
             </div>
           </div>
