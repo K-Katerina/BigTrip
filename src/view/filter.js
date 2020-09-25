@@ -1,4 +1,4 @@
-import {FilterType, FILTER_DEFAULT} from "../const";
+import {FilterType} from "../const";
 import {Smart} from "./smart";
 
 const createFilterTemplate = (isFutureTrip, isPastTrip, currentFilter) => {
