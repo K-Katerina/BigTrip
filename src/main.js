@@ -10,8 +10,9 @@ import Stats from "./view/stats";
 import Api from "./api/index";
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
+import moment from "moment";
 
-const AUTHORIZATION = `Basic 1234d4r45`;
+const AUTHORIZATION = `Basic 1234d4r45${moment().weekday()}`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `bigtrip-localstorage`;
 const STORE_VER = `v12`;
@@ -78,7 +79,7 @@ body.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) 
 });
 
 window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`);
+  navigator.serviceWorker.register(`/js/sw.js`);
 });
 
 window.addEventListener(`online`, () => {

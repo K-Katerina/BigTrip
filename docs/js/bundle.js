@@ -27442,6 +27442,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_index__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./api/index */ "./src/api/index.js");
 /* harmony import */ var _api_store_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./api/store.js */ "./src/api/store.js");
 /* harmony import */ var _api_provider_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./api/provider.js */ "./src/api/provider.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_12__);
 
 
 
@@ -27455,7 +27457,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const AUTHORIZATION = `Basic 1234d4r45`;
+
+const AUTHORIZATION = `Basic 1234d4r45${moment__WEBPACK_IMPORTED_MODULE_12___default()().weekday()}`;
+console.log(AUTHORIZATION);
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `bigtrip-localstorage`;
 const STORE_VER = `v12`;
@@ -27522,7 +27526,7 @@ body.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) 
 });
 
 window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`);
+  navigator.serviceWorker.register(`/js/sw.js`);
 });
 
 window.addEventListener(`online`, () => {

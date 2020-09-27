@@ -1,4 +1,4 @@
-# Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
+# Личный проект [«Большое путешествие»](https://k-katerina.github.io/1052393-big-trip-12/) [![Build status][travis-image]][travis-url]
 
 * Студент: [Катерина Коротышева](https://up.htmlacademy.ru/ecmascript/12/user/1052393).
 * Наставник: [Виктор Кан](https://htmlacademy.ru/profile/viktorkan).

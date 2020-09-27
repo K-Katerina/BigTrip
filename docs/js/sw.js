@@ -30,7 +30,7 @@ self.addEventListener(`install`, (evt) => {
           `/img/photos/3.jpg`,
           `/img/photos/4.jpg`,
           `/img/photos/5.jpg`,
-          `/bundle.js`
+          `/js/bundle.js`
         ]);
       })
   );
