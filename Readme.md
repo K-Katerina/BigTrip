@@ -5,6 +5,7 @@
 Общие технические требования:
 * JavaScript
 * Webpack
+* Service Worker
 * Работа со сторонними библтотеками chart, moment, flatpickr
 
 [Сертификат: JavaScript. Архитектура клиентских приложений](https://assets.htmlacademy.ru/certificates/intensive/169/1052393.pdf?1601143249)
